@@ -229,8 +229,8 @@ importers:
         specifier: ^18.3.0
         version: 18.3.0
       '@types/react-syntax-highlighter':
-        specifier: ^15.5.11
-        version: 15.5.11
+        specifier: ^15.5.13
+        version: 15.5.13
       '@types/rss':
         specifier: ^0.0.32
         version: 0.0.32
@@ -3320,8 +3320,8 @@ packages:
   '@types/react-redux@7.1.25':
     resolution: {integrity: sha512-bAGh4e+w5D8dajd6InASVIyCo4pZLJ66oLb80F9OBLO1gKESbZcRCJpTT6uLXX+HAB57zw1WTdwJdAsewuTweg==}
 
-  '@types/react-syntax-highlighter@15.5.11':
-    resolution: {integrity: sha512-ZqIJl+Pg8kD+47kxUjvrlElrraSUrYa4h0dauY/U/FTUuprSCqvUj+9PNQNQzVc6AJgIWUUxn87/gqsMHNbRjw==}
+  '@types/react-syntax-highlighter@15.5.13':
+    resolution: {integrity: sha512-uLGJ87j6Sz8UaBAooU0T6lWJ0dBmjZgN1PZTrj05TNql2/XpC6+4HhMT5syIdFUUt+FASfCeLLv4kBygNU+8qA==}
 
   '@types/react-transition-group@4.4.6':
     resolution: {integrity: sha512-VnCdSxfcm08KjsJVQcfBmhEQAPnLB8G08hAxn39azX1qYBQ/5RVQuoHuKIcfKOdncuaUvEpFKFzEvbtIMsfVew==}
@@ -11732,7 +11732,7 @@ snapshots:
       hoist-non-react-statics: 3.3.2
       redux: 4.2.1
 
-  '@types/react-syntax-highlighter@15.5.11':
+  '@types/react-syntax-highlighter@15.5.13':
     dependencies:
       '@types/react': 18.3.1
 
