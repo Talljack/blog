@@ -14,7 +14,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.0.5",
+    "@clerk/nextjs": "^5.1.6",
     "@headlessui/react": "^1.7.19",
     "@hookform/resolvers": "^3.3.4",
     "@mdx-js/loader": "^3.0.1",
