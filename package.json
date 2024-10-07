@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^5.0.5",
-    "@headlessui/react": "^2.1.8",
+    "@headlessui/react": "^2.1.9",
     "@hookform/resolvers": "^3.3.4",
     "@mdx-js/loader": "^3.0.1",
     "@neondatabase/serverless": "^0.9.1",
