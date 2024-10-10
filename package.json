@@ -58,7 +58,7 @@
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.33.0",
     "edge-cors": "^0.2.1",
-    "framer-motion": "^11.1.7",
+    "framer-motion": "^11.11.7",
     "hashids": "^2.3.0",
     "next": "^14.2.3",
     "next-sanity": "^9.5.0",
