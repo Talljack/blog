@@ -54,32 +54,32 @@ export default function Layout({
               </Text>
               <Text className="text-center">
                 <Link
-                  href="https://yugangcao.com/twitter"
+                  href="https://x.com/Talljackcv"
                   className="text-xs text-zinc-600 underline"
                 >
                   Twitter
                 </Link>{' '}
                 |&nbsp;
-                <Link
+                {/* <Link
                   href="https://yugangcao.com/youtube"
                   className="text-xs text-zinc-600 underline"
                 >
                   YouTube
                 </Link>{' '}
-                |&nbsp;
+                |&nbsp; */}
                 <Link
-                  href="https://yugangcao.com/github"
+                  href="https://github.com/Talljack"
                   className="text-xs text-zinc-600 underline"
                 >
                   GitHub
                 </Link>{' '}
-                |&nbsp;
+                {/* |&nbsp;
                 <Link
                   href="https://yugangcao.com/bilibili"
                   className="text-xs text-zinc-600 underline"
                 >
                   哔哩哔哩
-                </Link>
+                </Link> */}
               </Text>
             </Section>
           </Container>
