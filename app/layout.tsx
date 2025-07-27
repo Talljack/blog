@@ -3,13 +3,19 @@ import './clerk.css'
 import './prism.css'
 
 import { ClerkProvider } from '@clerk/nextjs'
-import { type Metadata } from 'next'
+import { type Metadata, type Viewport } from 'next'
 
 import { ThemeProvider } from '~/app/(main)/ThemeProvider'
 import { url } from '~/lib'
-import { zhCN } from '~/lib/clerkLocalizations'
 import { sansFont } from '~/lib/font'
 import { seo } from '~/lib/seo'
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#000212' },
+    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
+  ],
+}
 
 export const metadata: Metadata = {
   metadataBase: seo.url,
@@ -19,10 +25,6 @@ export const metadata: Metadata = {
   },
   description: seo.description,
   keywords: 'Talljack,yugangcao,曹彧刚,前端,后端,开发者,独立,创新',
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#000212' },
-    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-  ],
   manifest: '/site.webmanifest',
   robots: {
     index: true,
@@ -67,7 +69,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider localization={zhCN}>
+    <ClerkProvider>
       <html
         lang="zh-CN"
         className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
