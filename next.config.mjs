@@ -10,6 +10,7 @@ import { get } from '@vercel/edge-config'
 const nextConfig = {
   experimental: {
     serverActions: true,
+    taint: true,
   },
 
   images: {
@@ -31,14 +32,34 @@ const nextConfig = {
   },
 
   async redirects() {
-    try {
-      return (await get('redirects')) ?? []
-    } catch {
+    if (process.env.VERCEL_ENV === 'development') {
       return []
     }
-  },
-  experimental: {
-    taint: true,
+    
+    try {
+      const redirects = await get('redirects')
+      return redirects ?? []
+    } catch (error) {
+      console.warn('Failed to fetch redirects from Edge Config:', error)
+      // 如果 Edge Config 获取失败，使用默认的重定向规则
+      return [
+        {
+          source: '/twitter',
+          destination: 'https://twitter.com/YugangCao',
+          permanent: true,
+        },
+        {
+          source: '/github',
+          destination: 'https://github.com/Talljack',
+          permanent: true,
+        },
+        {
+          source: '/bilibili',
+          destination: 'https://space.bilibili.com/384764287',
+          permanent: true,
+        },
+      ]
+    }
   },
 
   rewrites() {
