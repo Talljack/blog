@@ -44,7 +44,8 @@ export function Headline() {
         }}
       >
         <Balancer>
-          我是 Talljack，前端开发工程师，探求独立开发者中，热爱开源，代码之外也在学习其他技能。
+          我是
+          Talljack，前端开发工程师，探求独立开发者中，热爱开源，代码之外也在学习其他技能。
         </Balancer>
       </motion.p>
       <motion.div
@@ -60,11 +61,11 @@ export function Headline() {
         }}
       >
         <SocialLink
-          href="https://yugangcao.com/twitter"
+          href="https://x.com/Talljackcv"
           aria-label="我的推特"
           platform="twitter"
         />
-        <SocialLink
+        {/* <SocialLink
           href="https://yugangcao.com/youtube"
           aria-label="我的 YouTube"
           platform="youtube"
@@ -73,17 +74,17 @@ export function Headline() {
           href="https://yugangcao.com/bilibili"
           aria-label="我的 Bilibili"
           platform="bilibili"
-        />
+        /> */}
         <SocialLink
-          href="https://yugangcao.com/github"
+          href="https://github.com/Talljack"
           aria-label="我的 GitHub"
           platform="github"
         />
-        <SocialLink
+        {/* <SocialLink
           href="https://yugangcao.com/tg"
           aria-label="我的 Telegram"
           platform="telegram"
-        />
+        /> */}
         <SocialLink href="/feed.xml" platform="rss" aria-label="RSS 订阅" />
         <SocialLink
           href="mailto:yugang.cao12@gmail.com"

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     default: seo.title,
   },
   description: seo.description,
-  keywords: 'Talljack,yugangcao,曹彧刚,前端,后端,开发者,独立,创新',
+  keywords: 'Talljack,曹彧刚,前端,后端,开发者,独立,创新',
   manifest: '/site.webmanifest',
   robots: {
     index: true,
@@ -46,11 +46,11 @@ export const metadata: Metadata = {
     siteName: 'Talljack',
     locale: 'zh_CN',
     type: 'website',
-    url: 'https://yugangcao.com',
+    url: 'https://talljack.me',
   },
   twitter: {
-    site: '@YugangCao',
-    creator: '@YugangCao',
+    site: '@Talljackcv',
+    creator: '@Talljackcv',
     card: 'summary_large_image',
     title: seo.title,
     description: seo.description,
