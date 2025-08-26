@@ -1,0 +1,207 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "我的博客" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7] [cursor=pointer]: 我的博客
+        - generic [ref=e8]:
+          - button "Toggle theme" [ref=e9] [cursor=pointer]:
+            - img [ref=e10] [cursor=pointer]
+            - img
+            - generic [ref=e16] [cursor=pointer]: Toggle theme
+          - button "Toggle menu" [ref=e17] [cursor=pointer]:
+            - img [ref=e18] [cursor=pointer]
+            - generic [ref=e19] [cursor=pointer]: Toggle menu
+    - main [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - generic [ref=e23]:
+            - heading "欢迎来到我的博客" [level=1] [ref=e24]
+            - paragraph [ref=e25]: 分享技术心得与生活感悟
+          - generic [ref=e26]:
+            - link "浏览博客" [ref=e27] [cursor=pointer]:
+              - /url: /blog
+              - text: 浏览博客
+              - img [ref=e28] [cursor=pointer]
+            - link "了解更多" [ref=e30] [cursor=pointer]:
+              - /url: /about
+        - generic [ref=e31]:
+          - heading "推荐阅读" [level=2] [ref=e33]
+          - generic [ref=e34]:
+            - article [ref=e35]:
+              - generic [ref=e36]:
+                - generic [ref=e37]:
+                  - heading "Playwright 端到端测试完全指南" [level=2] [ref=e38]:
+                    - link "Playwright 端到端测试完全指南" [ref=e39] [cursor=pointer]:
+                      - /url: /blog/playwright-e2e-testing
+                  - paragraph [ref=e40]: 深入了解如何使用 Playwright 进行现代 Web 应用的端到端测试，包括最佳实践和高级用法。
+                - generic [ref=e41]:
+                  - generic [ref=e42]:
+                    - generic [ref=e43]:
+                      - img [ref=e44]
+                      - time [ref=e46]: 2024年01月04日
+                    - generic [ref=e47]:
+                      - img [ref=e48]
+                      - generic [ref=e51]: 6 分钟阅读
+                  - generic [ref=e52]:
+                    - generic [ref=e53]: Playwright
+                    - generic [ref=e54]: 测试
+                    - generic [ref=e55]: "+3"
+              - generic [ref=e57]: 推荐
+            - article [ref=e58]:
+              - generic [ref=e59]:
+                - generic [ref=e60]:
+                  - heading "使用 Next.js 构建现代化博客系统" [level=2] [ref=e61]:
+                    - link "使用 Next.js 构建现代化博客系统" [ref=e62] [cursor=pointer]:
+                      - /url: /blog/nextjs-blog-guide
+                  - paragraph [ref=e63]: 详细介绍如何使用 Next.js 15、TypeScript 和 Tailwind CSS 构建一个功能完整的博客系统。
+                - generic [ref=e64]:
+                  - generic [ref=e65]:
+                    - generic [ref=e66]:
+                      - img [ref=e67]
+                      - time [ref=e69]: 2024年01月02日
+                    - generic [ref=e70]:
+                      - img [ref=e71]
+                      - generic [ref=e74]: 3 分钟阅读
+                  - generic [ref=e75]:
+                    - generic [ref=e76]: Next.js
+                    - generic [ref=e77]: React
+                    - generic [ref=e78]: "+3"
+              - generic [ref=e80]: 推荐
+            - article [ref=e81]:
+              - generic [ref=e82]:
+                - generic [ref=e83]:
+                  - heading "Hello World - 我的第一篇博客" [level=2] [ref=e84]:
+                    - link "Hello World - 我的第一篇博客" [ref=e85] [cursor=pointer]:
+                      - /url: /blog/hello-world
+                  - paragraph [ref=e86]: 欢迎来到我的博客！这是一篇介绍性文章，展示了博客的基本功能和写作风格。
+                - generic [ref=e87]:
+                  - generic [ref=e88]:
+                    - generic [ref=e89]:
+                      - img [ref=e90]
+                      - time [ref=e92]: 2024年01月01日
+                    - generic [ref=e93]:
+                      - img [ref=e94]
+                      - generic [ref=e97]: 1 分钟阅读
+                  - generic [ref=e98]:
+                    - generic [ref=e99]: 博客
+                    - generic [ref=e100]: 开始
+                    - generic [ref=e101]: "+1"
+              - generic [ref=e103]: 推荐
+        - generic [ref=e104]:
+          - generic [ref=e105]:
+            - heading "最近文章" [level=2] [ref=e106]
+            - link "查看全部" [ref=e107] [cursor=pointer]:
+              - /url: /blog
+              - text: 查看全部
+              - img [ref=e108] [cursor=pointer]
+          - generic [ref=e110]:
+            - article [ref=e111]:
+              - generic [ref=e112]:
+                - generic [ref=e113]:
+                  - heading "Playwright 端到端测试完全指南" [level=2] [ref=e114]:
+                    - link "Playwright 端到端测试完全指南" [ref=e115] [cursor=pointer]:
+                      - /url: /blog/playwright-e2e-testing
+                  - paragraph [ref=e116]: 深入了解如何使用 Playwright 进行现代 Web 应用的端到端测试，包括最佳实践和高级用法。
+                - generic [ref=e117]:
+                  - generic [ref=e118]:
+                    - generic [ref=e119]:
+                      - img [ref=e120]
+                      - time [ref=e122]: 2024年01月04日
+                    - generic [ref=e123]:
+                      - img [ref=e124]
+                      - generic [ref=e127]: 6 分钟阅读
+                  - generic [ref=e128]:
+                    - generic [ref=e129]: Playwright
+                    - generic [ref=e130]: 测试
+                    - generic [ref=e131]: "+3"
+              - generic [ref=e133]: 推荐
+            - article [ref=e134]:
+              - generic [ref=e135]:
+                - generic [ref=e136]:
+                  - heading "TypeScript 开发实用技巧" [level=2] [ref=e137]:
+                    - link "TypeScript 开发实用技巧" [ref=e138] [cursor=pointer]:
+                      - /url: /blog/typescript-tips
+                  - paragraph [ref=e139]: 分享一些在日常 TypeScript 开发中非常实用的技巧和最佳实践，帮助你写出更好的类型安全代码。
+                - generic [ref=e140]:
+                  - generic [ref=e141]:
+                    - generic [ref=e142]:
+                      - img [ref=e143]
+                      - time [ref=e145]: 2024年01月03日
+                    - generic [ref=e146]:
+                      - img [ref=e147]
+                      - generic [ref=e150]: 5 分钟阅读
+                  - generic [ref=e151]:
+                    - generic [ref=e152]: TypeScript
+                    - generic [ref=e153]: JavaScript
+                    - generic [ref=e154]: "+2"
+            - article [ref=e155]:
+              - generic [ref=e156]:
+                - generic [ref=e157]:
+                  - heading "使用 Next.js 构建现代化博客系统" [level=2] [ref=e158]:
+                    - link "使用 Next.js 构建现代化博客系统" [ref=e159] [cursor=pointer]:
+                      - /url: /blog/nextjs-blog-guide
+                  - paragraph [ref=e160]: 详细介绍如何使用 Next.js 15、TypeScript 和 Tailwind CSS 构建一个功能完整的博客系统。
+                - generic [ref=e161]:
+                  - generic [ref=e162]:
+                    - generic [ref=e163]:
+                      - img [ref=e164]
+                      - time [ref=e166]: 2024年01月02日
+                    - generic [ref=e167]:
+                      - img [ref=e168]
+                      - generic [ref=e171]: 3 分钟阅读
+                  - generic [ref=e172]:
+                    - generic [ref=e173]: Next.js
+                    - generic [ref=e174]: React
+                    - generic [ref=e175]: "+3"
+              - generic [ref=e177]: 推荐
+            - article [ref=e178]:
+              - generic [ref=e179]:
+                - generic [ref=e180]:
+                  - heading "Hello World - 我的第一篇博客" [level=2] [ref=e181]:
+                    - link "Hello World - 我的第一篇博客" [ref=e182] [cursor=pointer]:
+                      - /url: /blog/hello-world
+                  - paragraph [ref=e183]: 欢迎来到我的博客！这是一篇介绍性文章，展示了博客的基本功能和写作风格。
+                - generic [ref=e184]:
+                  - generic [ref=e185]:
+                    - generic [ref=e186]:
+                      - img [ref=e187]
+                      - time [ref=e189]: 2024年01月01日
+                    - generic [ref=e190]:
+                      - img [ref=e191]
+                      - generic [ref=e194]: 1 分钟阅读
+                  - generic [ref=e195]:
+                    - generic [ref=e196]: 博客
+                    - generic [ref=e197]: 开始
+                    - generic [ref=e198]: "+1"
+              - generic [ref=e200]: 推荐
+    - contentinfo [ref=e201]:
+      - generic [ref=e203]:
+        - generic [ref=e204]:
+          - paragraph [ref=e205]: © 2025 你的名字. All rights reserved.
+          - paragraph [ref=e206]: 分享技术心得与生活感悟
+        - generic [ref=e207]:
+          - link "GitHub" [ref=e208] [cursor=pointer]:
+            - /url: https://github.com/yourusername
+            - img [ref=e209] [cursor=pointer]
+            - generic [ref=e212] [cursor=pointer]: GitHub
+          - link "Twitter" [ref=e213] [cursor=pointer]:
+            - /url: https://twitter.com/yourusername
+            - img [ref=e214] [cursor=pointer]
+            - generic [ref=e216] [cursor=pointer]: Twitter
+          - link "Email" [ref=e217] [cursor=pointer]:
+            - /url: mailto:your-email@example.com
+            - img [ref=e218] [cursor=pointer]
+            - generic [ref=e221] [cursor=pointer]: Email
+          - link "RSS Feed" [ref=e222] [cursor=pointer]:
+            - /url: /rss.xml
+            - img [ref=e223] [cursor=pointer]
+            - generic [ref=e227] [cursor=pointer]: RSS Feed
+  - button "Open Next.js Dev Tools" [ref=e233] [cursor=pointer]:
+    - img [ref=e234] [cursor=pointer]
+  - alert [ref=e237]
+```
