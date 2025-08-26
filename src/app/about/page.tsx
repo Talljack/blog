@@ -1,5 +1,4 @@
 import { siteConfig } from '@/lib/config'
-import { Github, Twitter, Mail } from 'lucide-react'
 import Link from 'next/link'
 
 export const metadata = {
@@ -9,128 +8,123 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">关于我</h1>
-          <p className="text-xl text-muted-foreground">
-            {siteConfig.author.bio}
-          </p>
-        </div>
+    <main className="max-w-2xl mx-auto px-6 pb-16">
+      {/* 页面标题 - 简洁优雅 */}
+      <div className="mb-8">
+        <h1 className="heading-font text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+          关于我
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+          {siteConfig.author.bio}
+        </p>
+      </div>
 
-        {/* Content */}
-        <div className="prose prose-gray dark:prose-invert max-w-none">
-          <div className="space-y-6">
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">Hello, World! 👋</h2>
+      {/* 优雅的分割线 */}
+      <div className="elegant-divider mb-8" />
+
+      {/* 内容区域 - 专注阅读模式 */}
+      <article className="prose reading-mode">
+        <div className="space-y-8">
+          {/* 简单的自我介绍 */}
+          <section>
+            <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+              欢迎来到我的个人博客！我热爱分享技术心得和生活感悟，
+              希望通过文字记录成长的点点滴滴，也期待与志同道合的朋友交流。
+            </p>
+          </section>
+
+          {/* 技能与兴趣 - 简洁文本形式 */}
+          <section>
+            <h2 className="heading-font text-base font-medium mb-4 text-gray-900 dark:text-gray-100">
+              技术栈
+            </h2>
+            <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
               <p>
-                欢迎来到我的个人博客！我是一名{siteConfig.author.bio}，
-                热爱分享技术心得和生活感悟。
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">我的技能</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-lg bg-muted">
-                  <h3 className="font-medium">前端开发</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    React, Next.js, TypeScript
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-muted">
-                  <h3 className="font-medium">后端开发</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Node.js, Python, Go
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-muted">
-                  <h3 className="font-medium">数据库</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    MySQL, PostgreSQL, MongoDB
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-muted">
-                  <h3 className="font-medium">云服务</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    AWS, Vercel, Docker
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-muted">
-                  <h3 className="font-medium">工具</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Git, VS Code, Linux
-                  </p>
-                </div>
-                <div className="p-4 rounded-lg bg-muted">
-                  <h3 className="font-medium">其他</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    AI/ML, 区块链, DevOps
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">关于这个博客</h2>
-              <p>
-                这个博客使用 <strong>Next.js 15</strong> 和 <strong>Tailwind CSS</strong> 构建，
-                支持 Markdown/MDX 文章，具有响应式设计和暗色模式。
+                <span className="text-gray-900 dark:text-gray-100">前端：</span>
+                React, Next.js, TypeScript, Tailwind CSS
               </p>
               <p>
-                我会在这里分享：
+                <span className="text-gray-900 dark:text-gray-100">后端：</span>
+                Node.js, Python, Go, PostgreSQL
               </p>
-              <ul>
-                <li>技术教程和实践经验</li>
-                <li>开源项目和代码分享</li>
-                <li>行业观察和思考</li>
-                <li>生活感悟和个人成长</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold mb-4">联系我</h2>
               <p>
-                如果你想与我交流，可以通过以下方式联系我：
+                <span className="text-gray-900 dark:text-gray-100">工具：</span>
+                Git, VS Code, Docker, Vercel
               </p>
-              <div className="flex flex-wrap gap-4 mt-4">
-                {siteConfig.author.social.github && (
+            </div>
+          </section>
+
+          {/* 博客相关 */}
+          <section>
+            <h2 className="heading-font text-base font-medium mb-4 text-gray-900 dark:text-gray-100">
+              关于这个博客
+            </h2>
+            <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+              <p>
+                这个博客使用 <span className="text-gray-900 dark:text-gray-100">Next.js 15</span> 和 
+                <span className="text-gray-900 dark:text-gray-100"> Tailwind CSS</span> 构建，
+                支持 Markdown 文章，具有响应式设计和暗色模式。
+              </p>
+              <p>
+                我会在这里分享技术教程、开源项目、行业观察和生活感悟。
+              </p>
+            </div>
+          </section>
+
+          {/* 联系方式 - 简洁版本 */}
+          <section>
+            <h2 className="heading-font text-base font-medium mb-4 text-gray-900 dark:text-gray-100">
+              联系方式
+            </h2>
+            <div className="space-y-2 text-sm">
+              {siteConfig.author.social.github && (
+                <div>
+                  <span className="text-gray-500 dark:text-gray-500">GitHub:</span>{' '}
                   <Link
                     href={siteConfig.author.social.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-2 rounded-md bg-muted px-4 py-2 text-sm font-medium hover:bg-muted/80 transition-colors"
+                    className="elegant-link"
                   >
-                    <Github className="h-4 w-4" />
-                    <span>GitHub</span>
+                    {siteConfig.author.social.github.replace('https://github.com/', '@')}
                   </Link>
-                )}
-                {siteConfig.author.social.twitter && (
+                </div>
+              )}
+              {siteConfig.author.social.twitter && (
+                <div>
+                  <span className="text-gray-500 dark:text-gray-500">Twitter:</span>{' '}
                   <Link
                     href={siteConfig.author.social.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center space-x-2 rounded-md bg-muted px-4 py-2 text-sm font-medium hover:bg-muted/80 transition-colors"
+                    className="elegant-link"
                   >
-                    <Twitter className="h-4 w-4" />
-                    <span>Twitter</span>
+                    {siteConfig.author.social.twitter.replace('https://twitter.com/', '@')}
                   </Link>
-                )}
-                {siteConfig.author.social.email && (
+                </div>
+              )}
+              {siteConfig.author.social.email && (
+                <div>
+                  <span className="text-gray-500 dark:text-gray-500">Email:</span>{' '}
                   <Link
                     href={`mailto:${siteConfig.author.social.email}`}
-                    className="inline-flex items-center space-x-2 rounded-md bg-muted px-4 py-2 text-sm font-medium hover:bg-muted/80 transition-colors"
+                    className="elegant-link"
                   >
-                    <Mail className="h-4 w-4" />
-                    <span>Email</span>
+                    {siteConfig.author.social.email}
                   </Link>
-                )}
-              </div>
-            </section>
-          </div>
+                </div>
+              )}
+            </div>
+          </section>
         </div>
+      </article>
+
+      {/* 底部优雅装饰 */}
+      <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 text-center">
+        <p className="text-xs text-gray-500 dark:text-gray-500">
+          感谢您的阅读
+        </p>
       </div>
-    </div>
+    </main>
   )
 }

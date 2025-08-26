@@ -1,69 +1,78 @@
 import Link from 'next/link'
 import { BlogPostMeta } from '@/lib/blog'
 import { formatDateChinese } from '@/lib/utils'
-import { Clock, Calendar } from 'lucide-react'
 
 interface BlogCardProps {
   post: BlogPostMeta
+  showDescription?: boolean
 }
 
-export default function BlogCard({ post }: BlogCardProps) {
+export default function BlogCard({ post, showDescription = true }: BlogCardProps) {
   return (
-    <article className="group relative rounded-lg border p-6 hover:shadow-md transition-shadow">
-      <div className="flex flex-col justify-between space-y-4">
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold tracking-tight">
-            <Link 
-              href={`/blog/${post.slug}`}
-              className="hover:underline decoration-2 underline-offset-2"
+    <article className="py-4 border-b border-gray-100 dark:border-gray-800 last:border-b-0">
+      {/* 文章标题 - 更小的字体，符合参考网站 */}
+      <h2 className="heading-font text-base font-medium leading-tight mb-2">
+        <Link 
+          href={`/blog/${post.slug}`}
+          className="elegant-link hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
+        >
+          {post.title}
+        </Link>
+      </h2>
+
+      {/* 文章描述 */}
+      {showDescription && post.description && (
+        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-3 line-clamp-2">
+          {post.description}
+        </p>
+      )}
+
+      {/* 元信息 - 完全按照参考网站的布局 */}
+      <div className="flex items-center text-xs text-gray-500 dark:text-gray-500 space-x-1">
+        <time dateTime={post.date}>
+          {formatDateChinese(post.date)}
+        </time>
+        <span>·</span>
+        {post.readTime && (
+          <>
+            <span>{post.readTime} 分钟</span>
+            <span>·</span>
+          </>
+        )}
+        {post.author && (
+          <>
+            <span>{post.author}</span>
+            <span>·</span>
+          </>
+        )}
+        <span>{Math.ceil((post.readTime || 5) * 200)} 字</span>
+      </div>
+
+      {/* 标签 - 简化显示 */}
+      {post.tags && post.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {post.tags.slice(0, 2).map((tag) => (
+            <span
+              key={tag}
+              className="inline-block text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
             >
-              {post.title}
-            </Link>
-          </h2>
-          <p className="text-muted-foreground line-clamp-2">
-            {post.description}
-          </p>
-        </div>
-        
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1">
-              <Calendar className="h-4 w-4" />
-              <time dateTime={post.date}>
-                {formatDateChinese(post.date)}
-              </time>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Clock className="h-4 w-4" />
-              <span>{post.readTime} 分钟阅读</span>
-            </div>
-          </div>
-          
-          {post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {post.tags.slice(0, 2).map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
-              {post.tags.length > 2 && (
-                <span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium">
-                  +{post.tags.length - 2}
-                </span>
-              )}
-            </div>
+              {tag}
+            </span>
+          ))}
+          {post.tags.length > 2 && (
+            <span className="text-xs text-gray-500 dark:text-gray-500">
+              +{post.tags.length - 2}
+            </span>
           )}
         </div>
-      </div>
-      
+      )}
+
+      {/* 推荐标识 - 更简洁 */}
       {post.featured && (
-        <div className="absolute -top-2 -right-2">
-          <div className="rounded-full bg-primary px-2 py-1 text-xs text-primary-foreground">
-            推荐
-          </div>
+        <div className="mt-2">
+          <span className="inline-block text-xs px-2 py-1 rounded bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+            推荐阅读
+          </span>
         </div>
       )}
     </article>

@@ -1,10 +1,9 @@
 import { getAllPosts, getAllTags } from '@/lib/blog'
 import BlogCard from '@/components/BlogCard'
-import { Search, Filter } from 'lucide-react'
 
 export const metadata = {
   title: '博客',
-  description: '浏览所有博客文章',
+  description: '所有博客文章的归档',
 }
 
 export default async function BlogPage() {
@@ -14,62 +13,67 @@ export default async function BlogPage() {
   ])
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-8">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">博客</h1>
-        <p className="text-muted-foreground">
+    <main className="max-w-2xl mx-auto px-6 pb-16">
+      {/* 页面标题和描述 - 简洁版本 */}
+      <div className="mb-8">
+        <h1 className="heading-font text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+          博客归档
+        </h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
           共 {allPosts.length} 篇文章
         </p>
       </div>
 
-      {/* Search and Filter (placeholder for future implementation) */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="搜索文章..."
-            className="w-full rounded-md border border-input bg-background pl-10 pr-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled
-          />
-        </div>
-        <div className="relative">
-          <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <select
-            className="appearance-none rounded-md border border-input bg-background pl-10 pr-8 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled
-          >
-            <option>所有标签</option>
+      {/* 标签云 - 可选显示 */}
+      {allTags.length > 0 && (
+        <div className="mb-8 pb-8 border-b border-gray-200 dark:border-gray-800">
+          <h2 className="heading-font text-sm font-medium mb-3 text-gray-900 dark:text-gray-100">
+            标签
+          </h2>
+          <div className="flex flex-wrap gap-2">
             {allTags.map((tag) => (
-              <option key={tag} value={tag}>
+              <span key={tag} className="tag cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
                 {tag}
-              </option>
+              </span>
             ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Posts Grid */}
-      {allPosts.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {allPosts.map((post) => (
-            <BlogCard key={post.slug} post={post} />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">还没有文章</h2>
-            <p className="text-muted-foreground">
-              开始创建你的第一篇博客文章吧！
-            </p>
-            <p className="text-sm text-muted-foreground">
-              在 <code className="bg-muted px-1 py-0.5 rounded">src/content/blog</code> 目录下创建 Markdown 文件
-            </p>
           </div>
         </div>
       )}
-    </div>
+
+      {/* 文章列表 */}
+      {allPosts.length > 0 ? (
+        <section>
+          <div className="space-y-0">
+            {allPosts.map((post) => (
+              <BlogCard 
+                key={post.slug} 
+                post={post} 
+                showDescription={true} 
+              />
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className="text-center py-16">
+          <div className="space-y-4">
+            <h2 className="heading-font text-lg font-medium text-gray-900 dark:text-gray-100">
+              还没有文章
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed max-w-md mx-auto">
+              这里将展示所有的博客文章。请稍后再来查看精彩内容。
+            </p>
+          </div>
+        </section>
+      )}
+
+      {/* 文章统计 */}
+      {allPosts.length > 0 && (
+        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-500">
+            共 {allPosts.length} 篇文章 · {allTags.length} 个标签
+          </p>
+        </div>
+      )}
+    </main>
   )
 }
