@@ -1,5 +1,6 @@
 import { getAllPosts, getAllTags } from '@/lib/blog'
 import BlogCard from '@/components/BlogCard'
+import TagCloud from '@/components/TagCloud'
 
 export const metadata = {
   title: '博客',
@@ -24,21 +25,13 @@ export default async function BlogPage() {
         </p>
       </div>
 
-      {/* 标签云 - 可选显示 */}
-      {allTags.length > 0 && (
-        <div className="mb-8 pb-8 border-b border-gray-200 dark:border-gray-800">
-          <h2 className="heading-font text-sm font-medium mb-3 text-gray-900 dark:text-gray-100">
-            标签
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {allTags.map((tag) => (
-              <span key={tag} className="tag cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* 标签云 */}
+      <div className="mb-8 pb-8 border-b border-gray-200 dark:border-gray-800">
+        <h2 className="heading-font text-sm font-medium mb-4 text-gray-900 dark:text-gray-100">
+          标签
+        </h2>
+        <TagCloud maxTags={15} />
+      </div>
 
       {/* 文章列表 */}
       {allPosts.length > 0 ? (

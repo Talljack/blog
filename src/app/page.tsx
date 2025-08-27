@@ -10,7 +10,7 @@ export default async function HomePage() {
   const recentPosts = allPosts.slice(0, 10) // 显示更多文章，如参考网站
 
   return (
-    <main className="max-w-2xl mx-auto px-6 pb-16">
+    <main className="max-w-4xl mx-auto px-6 pb-16">
       {/* 推荐阅读部分 - 完全按照参考网站 */}
       {featuredPosts.length > 0 && (
         <section className="mb-8">

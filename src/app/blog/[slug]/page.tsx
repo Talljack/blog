@@ -6,6 +6,7 @@ import { formatDateChinese } from '@/lib/utils'
 import { ArrowLeft, Calendar, Clock, Tag, User } from 'lucide-react'
 import Comments from '@/components/Comments'
 import StructuredData from '@/components/StructuredData'
+import ViewCounter from '@/components/ViewCounter'
 
 interface PostPageProps {
   params: Promise<{
@@ -147,6 +148,10 @@ export default async function PostPage({ params }: PostPageProps) {
           <div className="flex items-center gap-1">
             <span>约 {Math.ceil(post.readTime * 200)} 字</span>
           </div>
+          
+          {/* 浏览量统计 */}
+          <span className="text-gray-300 dark:text-gray-600">·</span>
+          <ViewCounter slug={post.slug} increment={true} />
         </div>
 
         {/* 标签 */}

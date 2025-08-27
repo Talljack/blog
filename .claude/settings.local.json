@@ -14,7 +14,9 @@
       "Bash(kill:*)",
       "Bash(curl:*)",
       "WebSearch",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm run:*)"
     ],
     "deny": [],
     "ask": []

@@ -27,6 +27,16 @@
   }
 }
 
+/* 基于类的暗色模式 - 用于手动切换 */
+.dark {
+  --foreground-rgb: 229, 229, 229;
+  --background-start-rgb: 17, 17, 17;
+  --background-end-rgb: 17, 17, 17;
+  --muted-foreground: 163, 163, 163;
+  --border: 39, 39, 42;
+  --accent: 24, 24, 27;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -275,4 +285,55 @@ body {
 
 .subtle-shadow:hover {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+/* 搜索结果高亮 */
+.search-highlight {
+  background-color: rgb(254 240 138 / 0.5); /* yellow-200 with opacity */
+  padding: 0.1rem 0.2rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+/* 深色模式下的搜索高亮 */
+.dark .search-highlight {
+  background-color: rgb(180 83 9 / 0.3); /* amber-700 with opacity */
+}
+
+/* 限制文本行数 */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* 搜索框焦点效果 */
+.search-input:focus {
+  box-shadow: 0 0 0 3px rgb(156 163 175 / 0.1);
+}
+
+/* 热门文章动画 */
+.trending-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.trending-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
 }

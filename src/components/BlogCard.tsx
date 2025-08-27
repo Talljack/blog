@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { BlogPostMeta } from '@/lib/blog'
 import { formatDateChinese } from '@/lib/utils'
+import ViewCounter from './ViewCounter'
 
 interface BlogCardProps {
   post: BlogPostMeta
@@ -46,18 +47,21 @@ export default function BlogCard({ post, showDescription = true }: BlogCardProps
           </>
         )}
         <span>{Math.ceil((post.readTime || 5) * 200)} 字</span>
+        <span>·</span>
+        <ViewCounter slug={post.slug} increment={false} />
       </div>
 
-      {/* 标签 - 简化显示 */}
+      {/* 标签 - 可点击 */}
       {post.tags && post.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-2">
           {post.tags.slice(0, 2).map((tag) => (
-            <span
+            <Link
               key={tag}
-              className="inline-block text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+              href={`/tag/${encodeURIComponent(tag)}`}
+              className="inline-block text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             >
               {tag}
-            </span>
+            </Link>
           ))}
           {post.tags.length > 2 && (
             <span className="text-xs text-gray-500 dark:text-gray-500">
