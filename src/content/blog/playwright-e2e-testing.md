@@ -1,10 +1,10 @@
 ---
-title: "Playwright 端到端测试完全指南"
-description: "深入了解如何使用 Playwright 进行现代 Web 应用的端到端测试，包括最佳实践和高级用法。"
-date: "2024-01-04"
-tags: ["Playwright", "测试", "E2E", "Web开发", "自动化"]
+title: 'Playwright 端到端测试完全指南'
+description: '深入了解如何使用 Playwright 进行现代 Web 应用的端到端测试，包括最佳实践和高级用法。'
+date: '2024-01-04'
+tags: ['Playwright', '测试', 'E2E', 'Web开发', '自动化']
 featured: true
-author: "作者"
+author: '作者'
 ---
 
 # Playwright 端到端测试完全指南
@@ -24,13 +24,13 @@ Playwright 是一个用于 Web 应用自动化测试的开源框架，由微软�
 
 ### 与其他测试工具对比
 
-| 特性 | Playwright | Selenium | Cypress |
-|------|------------|----------|---------|
-| 多浏览器支持 | ✅ 原生支持 | ✅ 需要驱动 | ❌ 主要 Chrome |
-| 速度 | 🚀 极快 | 🐌 较慢 | ⚡ 快 |
-| API 一致性 | ✅ 统一 API | ❌ 各浏览器不同 | ✅ 统一 |
-| 网络拦截 | ✅ 内置 | ❌ 需要额外工具 | ✅ 内置 |
-| 移动测试 | ✅ 支持 | ❌ 复杂 | ❌ 不支持 |
+| 特性         | Playwright  | Selenium        | Cypress        |
+| ------------ | ----------- | --------------- | -------------- |
+| 多浏览器支持 | ✅ 原生支持 | ✅ 需要驱动     | ❌ 主要 Chrome |
+| 速度         | 🚀 极快     | 🐌 较慢         | ⚡ 快          |
+| API 一致性   | ✅ 统一 API | ❌ 各浏览器不同 | ✅ 统一        |
+| 网络拦截     | ✅ 内置     | ❌ 需要额外工具 | ✅ 内置        |
+| 移动测试     | ✅ 支持     | ❌ 复杂         | ❌ 不支持      |
 
 ### 核心优势
 
@@ -68,7 +68,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
-  
+
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
@@ -113,30 +113,30 @@ import { test, expect } from '@playwright/test'
 
 test('博客首页加载正常', async ({ page }) => {
   await page.goto('/')
-  
+
   // 检查页面标题
   await expect(page).toHaveTitle(/我的博客/)
-  
+
   // 检查主标题存在
   await expect(page.locator('h1')).toContainText('欢迎来到')
-  
+
   // 检查导航链接
   await expect(page.locator('nav a[href="/blog"]')).toBeVisible()
 })
 
 test('博客列表页功能', async ({ page }) => {
   await page.goto('/blog')
-  
+
   // 检查页面标题
   await expect(page.locator('h1')).toContainText('博客')
-  
+
   // 检查文章卡片存在
   const articleCards = page.locator('article')
   await expect(articleCards).toHaveCountGreaterThan(0)
-  
+
   // 点击第一篇文章
   await articleCards.first().locator('a').first().click()
-  
+
   // 验证跳转到文章详情页
   await expect(page.url()).toMatch(/\/blog\/[^\/]+$/)
 })
@@ -147,19 +147,19 @@ test('博客列表页功能', async ({ page }) => {
 ```typescript
 test('选择器示例', async ({ page }) => {
   await page.goto('/blog')
-  
+
   // CSS 选择器
   await page.locator('.blog-card').first().click()
-  
+
   // 文本选择器
   await page.locator('text=阅读更多').click()
-  
+
   // 角色选择器
   await page.locator('role=button[name="搜索"]').click()
-  
+
   // 组合选择器
   await page.locator('article:has-text("Playwright")').click()
-  
+
   // XPath 选择器
   await page.locator('//button[contains(text(), "提交")]').click()
 })
@@ -172,18 +172,18 @@ test('选择器示例', async ({ page }) => {
 ```typescript
 test('评论表单提交', async ({ page }) => {
   await page.goto('/blog/hello-world')
-  
+
   // 滚动到评论区
   await page.locator('#comments').scrollIntoViewIfNeeded()
-  
+
   // 填写表单
   await page.fill('[name="name"]', '测试用户')
   await page.fill('[name="email"]', 'test@example.com')
   await page.fill('[name="comment"]', '这是一条测试评论')
-  
+
   // 提交表单
   await page.click('button[type="submit"]')
-  
+
   // 验证提交成功
   await expect(page.locator('.success-message')).toBeVisible()
   await expect(page.locator('.comment')).toContainText('测试用户')
@@ -198,22 +198,22 @@ test('API 请求拦截', async ({ page }) => {
   await page.route('/api/posts', async route => {
     const response = await route.fetch()
     const json = await response.json()
-    
+
     // 修改响应数据
     json.posts.push({
       id: 999,
       title: '测试文章',
-      content: '这是测试内容'
+      content: '这是测试内容',
     })
-    
+
     await route.fulfill({
       response,
-      json
+      json,
     })
   })
-  
+
   await page.goto('/blog')
-  
+
   // 验证修改后的数据
   await expect(page.locator('text=测试文章')).toBeVisible()
 })
@@ -224,16 +224,16 @@ test('API 请求拦截', async ({ page }) => {
 ```typescript
 test('头像上传功能', async ({ page }) => {
   await page.goto('/profile')
-  
+
   // 选择文件
   const fileChooserPromise = page.waitForEvent('filechooser')
   await page.locator('input[type="file"]').click()
   const fileChooser = await fileChooserPromise
   await fileChooser.setFiles('./tests/fixtures/avatar.png')
-  
+
   // 验证上传成功
   await expect(page.locator('.avatar img')).toHaveAttribute(
-    'src', 
+    'src',
     /avatar\.png$/
   )
 })
@@ -269,10 +269,10 @@ export class BlogPage {
 // 使用 POM
 test('使用页面对象', async ({ page }) => {
   const blogPage = new BlogPage(page)
-  
+
   await blogPage.goto()
   await blogPage.searchPosts('Playwright')
-  
+
   const titles = await blogPage.getPostTitles()
   expect(titles).toContain('Playwright 端到端测试完全指南')
 })
@@ -293,7 +293,7 @@ searchQueries.forEach(({ query, expectedCount }) => {
     await page.goto('/blog')
     await page.fill('[placeholder="搜索文章..."]', query)
     await page.press('[placeholder="搜索文章..."]', 'Enter')
-    
+
     const results = page.locator('article')
     await expect(results).toHaveCount(expectedCount)
   })
@@ -305,10 +305,10 @@ searchQueries.forEach(({ query, expectedCount }) => {
 ```typescript
 test('页面视觉一致性', async ({ page }) => {
   await page.goto('/blog')
-  
+
   // 全页面截图对比
   await expect(page).toHaveScreenshot('blog-page.png')
-  
+
   // 组件级截图对比
   await expect(page.locator('.header')).toHaveScreenshot('header.png')
 })
@@ -346,17 +346,18 @@ test.describe('博客功能测试', () => {
 ```typescript
 test('正确的等待方式', async ({ page }) => {
   await page.goto('/blog')
-  
+
   // ✅ 正确：等待元素出现
   await expect(page.locator('.loading')).toBeHidden()
   await expect(page.locator('article')).toBeVisible()
-  
+
   // ❌ 错误：硬编码等待时间
   // await page.waitForTimeout(3000)
-  
+
   // ✅ 正确：等待网络请求完成
-  await page.waitForResponse(response => 
-    response.url().includes('/api/posts') && response.status() === 200
+  await page.waitForResponse(
+    response =>
+      response.url().includes('/api/posts') && response.status() === 200
   )
 })
 ```
@@ -371,12 +372,12 @@ test('错误场景处理', async ({ page }) => {
       console.log('页面错误:', msg.text())
     }
   })
-  
+
   // 监听网络失败
   page.on('requestfailed', request => {
     console.log('网络请求失败:', request.url())
   })
-  
+
   await page.goto('/blog')
 })
 ```
@@ -390,31 +391,31 @@ test('错误场景处理', async ({ page }) => {
 name: Playwright Tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
-    
+    branches: [main, master]
+
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
 ```
 
 ## 调试技巧
@@ -445,17 +446,19 @@ npx playwright codegen localhost:3000
 ```typescript
 test('页面性能检查', async ({ page }) => {
   await page.goto('/blog')
-  
+
   // 获取性能指标
   const performanceEntries = await page.evaluate(() => {
     return JSON.stringify(performance.getEntriesByType('navigation'))
   })
-  
+
   const navigation = JSON.parse(performanceEntries)[0]
-  
+
   // 断言性能指标
   expect(navigation.loadEventEnd - navigation.loadEventStart).toBeLessThan(2000)
-  expect(navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart).toBeLessThan(1000)
+  expect(
+    navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart
+  ).toBeLessThan(1000)
 })
 ```
 
@@ -464,18 +467,21 @@ test('页面性能检查', async ({ page }) => {
 Playwright 是一个功能强大、现代化的端到端测试框架，具有以下优势：
 
 ### 🎯 核心价值
+
 - **可靠性高** - 自动等待机制减少不稳定测试
 - **覆盖面广** - 支持多浏览器和移动端测试
 - **开发体验好** - 丰富的调试工具和文档
 - **维护成本低** - 统一的 API 和良好的生态
 
 ### 🚀 使用建议
+
 1. **从简单开始** - 先写基础的页面加载测试
 2. **逐步完善** - 添加交互、表单、网络等测试
 3. **重视维护** - 使用 POM 模式组织代码
 4. **持续优化** - 监控测试稳定性和执行时间
 
 ### 📈 未来发展
+
 - 更好的组件测试支持
 - AI 辅助的测试生成
 - 更丰富的性能分析功能
@@ -492,4 +498,4 @@ Playwright 让端到端测试变得更加简单和可靠，是现代 Web 开发�
 
 ---
 
-*自动化测试是软件质量的保障，Playwright 让这个过程更加高效和愉悦！* 🎭
+_自动化测试是软件质量的保障，Playwright 让这个过程更加高效和愉悦！_ 🎭

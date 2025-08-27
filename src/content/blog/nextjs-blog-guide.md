@@ -1,10 +1,10 @@
 ---
-title: "使用 Next.js 构建现代化博客系统"
-description: "详细介绍如何使用 Next.js 15、TypeScript 和 Tailwind CSS 构建一个功能完整的博客系统。"
-date: "2024-01-02"
-tags: ["Next.js", "React", "TypeScript", "博客", "教程"]
+title: '使用 Next.js 构建现代化博客系统'
+description: '详细介绍如何使用 Next.js 15、TypeScript 和 Tailwind CSS 构建一个功能完整的博客系统。'
+date: '2024-01-02'
+tags: ['Next.js', 'React', 'TypeScript', '博客', '教程']
 featured: true
-author: "作者"
+author: '作者'
 ---
 
 # 使用 Next.js 构建现代化博客系统
@@ -60,10 +60,10 @@ blog/
 
 ```markdown
 ---
-title: "文章标题"
-description: "文章描述"
-date: "2024-01-01"
-tags: ["标签1", "标签2"]
+title: '文章标题'
+description: '文章描述'
+date: '2024-01-01'
+tags: ['标签1', '标签2']
 featured: true
 ---
 
@@ -80,7 +80,7 @@ Next.js 的 App Router 让我们可以轻松创建动态路由：
 // app/blog/[slug]/page.tsx
 export async function generateStaticParams() {
   const posts = await getAllPosts()
-  return posts.map((post) => ({
+  return posts.map(post => ({
     slug: post.slug,
   }))
 }
@@ -93,7 +93,7 @@ export async function generateStaticParams() {
 ```tsx
 export async function generateMetadata({ params }: PostPageProps) {
   const post = await getPostBySlug(params.slug)
-  
+
   return {
     title: post.title,
     description: post.description,
@@ -230,4 +230,4 @@ npm run build
 
 ---
 
-*如果你觉得这篇文章有用，欢迎分享给更多人！* ✨
+_如果你觉得这篇文章有用，欢迎分享给更多人！_ ✨

@@ -22,12 +22,12 @@ export default function GoogleAnalytics() {
   return (
     <>
       <Script
-        strategy="afterInteractive"
+        strategy='afterInteractive'
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
       />
       <Script
-        id="google-analytics"
-        strategy="afterInteractive"
+        id='google-analytics'
+        strategy='afterInteractive'
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
@@ -54,7 +54,12 @@ export const pageview = (url: string) => {
 }
 
 // 用于发送自定义事件的函数
-export const event = ({ action, category, label, value }: {
+export const event = ({
+  action,
+  category,
+  label,
+  value,
+}: {
   action: string
   category: string
   label?: string

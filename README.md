@@ -80,12 +80,12 @@ npm start
 
 ```markdown
 ---
-title: "文章标题"
-description: "文章描述"
-date: "2024-01-01"
-tags: ["标签1", "标签2"]
+title: '文章标题'
+description: '文章描述'
+date: '2024-01-01'
+tags: ['标签1', '标签2']
 featured: true
-author: "作者名"
+author: '作者名'
 ---
 
 # 文章内容

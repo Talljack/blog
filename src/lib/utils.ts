@@ -32,14 +32,18 @@ export function generateRSSFeed(posts: any[]) {
         <title>我的博客</title>
         <description>分享技术心得与生活感悟</description>
         <link>https://your-blog-url.com</link>
-        ${posts.map(post => `
+        ${posts
+          .map(
+            post => `
           <item>
             <title>${post.title}</title>
             <description>${post.description}</description>
             <link>https://your-blog-url.com/blog/${post.slug}</link>
             <pubDate>${new Date(post.date).toUTCString()}</pubDate>
           </item>
-        `).join('')}
+        `
+          )
+          .join('')}
       </channel>
     </rss>`
 }

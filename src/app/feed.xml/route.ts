@@ -27,10 +27,10 @@ export async function GET() {
       <height>144</height>
     </image>
     ${posts
-      .map((post) => {
+      .map(post => {
         const postUrl = `${siteUrl}/blog/${post.slug}`
         const pubDate = new Date(post.date).toUTCString()
-        
+
         return `
     <item>
       <title><![CDATA[${post.title}]]></title>

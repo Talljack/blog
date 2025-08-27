@@ -46,12 +46,12 @@ function calculateReadTime(content: string): number {
 
 export async function getAllPosts(): Promise<BlogPostMeta[]> {
   ensurePostsDirectory()
-  
+
   const fileNames = fs.readdirSync(postsDirectory)
   const allPostsData = await Promise.all(
     fileNames
-      .filter((fileName) => fileName.endsWith('.md') || fileName.endsWith('.mdx'))
-      .map(async (fileName) => {
+      .filter(fileName => fileName.endsWith('.md') || fileName.endsWith('.mdx'))
+      .map(async fileName => {
         const slug = fileName.replace(/\.(md|mdx)$/, '')
         const fullPath = path.join(postsDirectory, fileName)
         const fileContents = fs.readFileSync(fullPath, 'utf8')
@@ -75,7 +75,7 @@ export async function getAllPosts(): Promise<BlogPostMeta[]> {
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   ensurePostsDirectory()
-  
+
   try {
     const fullPath = path.join(postsDirectory, `${slug}.md`)
     let fileContents: string
@@ -92,12 +92,12 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     }
 
     const { data, content } = matter(fileContents)
-    
+
     const processedContent = await remark()
       .use(remarkGfm)
       .use(html, { sanitize: false })
       .process(content)
-    
+
     const contentHtml = processedContent.toString()
 
     return {

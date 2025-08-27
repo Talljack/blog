@@ -14,11 +14,11 @@ export default function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button 
-        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-        aria-label="切换主题"
+      <button
+        className='p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+        aria-label='切换主题'
       >
-        <Sun className="w-4 h-4" />
+        <Sun className='w-4 h-4' />
       </button>
     )
   }
@@ -26,13 +26,13 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-      aria-label="切换主题"
+      className='p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+      aria-label='切换主题'
     >
       {resolvedTheme === 'dark' ? (
-        <Sun className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+        <Sun className='w-4 h-4 text-gray-600 dark:text-gray-400' />
       ) : (
-        <Moon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+        <Moon className='w-4 h-4 text-gray-600 dark:text-gray-400' />
       )}
     </button>
   )

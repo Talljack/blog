@@ -17,26 +17,26 @@ export async function GET(request: NextRequest) {
     const posts = await getAllPosts()
     const courses = getAllCourses()
     const templates = getAllTemplates()
-    
+
     // 为文章添加类型标识
     const postsWithType = posts.map(post => ({
       ...post,
-      type: 'post' as const
+      type: 'post' as const,
     }))
-    
+
     // 合并所有内容
     const allContent = [...postsWithType, ...courses, ...templates]
 
     // 配置 Fuse.js 搜索选项
     const fuseOptions = {
       keys: [
-        { name: 'title', weight: 0.4 },      // 标题权重最高
+        { name: 'title', weight: 0.4 }, // 标题权重最高
         { name: 'description', weight: 0.3 }, // 描述权重次之
-        { name: 'tags', weight: 0.2 },        // 标签权重
-        { name: 'author', weight: 0.1 },      // 作者权重最低
+        { name: 'tags', weight: 0.2 }, // 标签权重
+        { name: 'author', weight: 0.1 }, // 作者权重最低
       ],
       threshold: 0.4, // 搜索敏感度 (0.0 = 完全匹配, 1.0 = 匹配所有)
-      distance: 100,  // 最大搜索距离
+      distance: 100, // 最大搜索距离
       minMatchCharLength: 2, // 最小匹配字符数
       includeScore: true,
       includeMatches: true,
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     const searchResults = fuse.search(query).slice(0, 10) // 限制返回10个结果
 
     // 格式化搜索结果，按类型分组
-    const results = searchResults.map((result) => ({
+    const results = searchResults.map(result => ({
       ...result.item,
       score: result.score,
       matches: result.matches,
@@ -60,20 +60,16 @@ export async function GET(request: NextRequest) {
     const courses_results = results.filter(item => item.type === 'course')
     const templates_results = results.filter(item => item.type === 'template')
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       results,
       posts: posts_results,
       courses: courses_results,
       templates: templates_results,
       query,
-      total: searchResults.length 
+      total: searchResults.length,
     })
-
   } catch (error) {
     console.error('Search error:', error)
-    return NextResponse.json(
-      { error: 'Search failed' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Search failed' }, { status: 500 })
   }
 }

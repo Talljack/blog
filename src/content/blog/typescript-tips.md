@@ -1,9 +1,9 @@
 ---
-title: "TypeScript 开发实用技巧"
-description: "分享一些在日常 TypeScript 开发中非常实用的技巧和最佳实践，帮助你写出更好的类型安全代码。"
-date: "2024-01-03"
-tags: ["TypeScript", "JavaScript", "开发技巧", "类型安全"]
-author: "作者"
+title: 'TypeScript 开发实用技巧'
+description: '分享一些在日常 TypeScript 开发中非常实用的技巧和最佳实践，帮助你写出更好的类型安全代码。'
+date: '2024-01-03'
+tags: ['TypeScript', 'JavaScript', '开发技巧', '类型安全']
+author: '作者'
 ---
 
 # TypeScript 开发实用技巧
@@ -25,10 +25,7 @@ interface User {
 type UserKeys = keyof User // 'id' | 'name' | 'email' | 'role'
 
 // 创建一个函数，只接受 User 对象的键
-function getUserField<K extends keyof User>(
-  user: User,
-  key: K
-): User[K] {
+function getUserField<K extends keyof User>(user: User, key: K): User[K] {
   return user[key]
 }
 ```
@@ -40,7 +37,7 @@ function getUserField<K extends keyof User>(
 type IsArray<T> = T extends (infer U)[] ? true : false
 
 type Test1 = IsArray<string[]> // true
-type Test2 = IsArray<string>   // false
+type Test2 = IsArray<string> // false
 
 // 提取 Promise 的返回类型
 type Awaited<T> = T extends Promise<infer U> ? U : T
@@ -55,9 +52,7 @@ type ApiResponse = Awaited<Promise<{ data: string }>> // { data: string }
 ```typescript
 // 深度只读
 type DeepReadonly<T> = {
-  readonly [P in keyof T]: T[P] extends object 
-    ? DeepReadonly<T[P]> 
-    : T[P]
+  readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P]
 }
 
 interface Config {
@@ -79,10 +74,7 @@ type ReadonlyConfig = DeepReadonly<Config>
 
 ```typescript
 // 创建 CSS 属性类型
-type CSSProperty = 
-  | 'margin' 
-  | 'padding' 
-  | 'border'
+type CSSProperty = 'margin' | 'padding' | 'border'
 
 type Directions = 'top' | 'right' | 'bottom' | 'left'
 
@@ -119,7 +111,7 @@ function moveAnimal(pet: Fish | Bird) {
   if (isFish(pet)) {
     pet.swim() // TypeScript 知道这里 pet 是 Fish
   } else {
-    pet.fly()  // TypeScript 知道这里 pet 是 Bird
+    pet.fly() // TypeScript 知道这里 pet 是 Bird
   }
 }
 ```
@@ -260,12 +252,12 @@ function List<T>({ items, renderItem, keyExtractor, ...props }: ListProps<T>) {
 ```json
 {
   "compilerOptions": {
-    "strict": true,                    // 启用所有严格检查
+    "strict": true, // 启用所有严格检查
     "noUncheckedIndexedAccess": true, // 索引访问时包含 undefined
     "exactOptionalPropertyTypes": true, // 精确可选属性类型
-    "noImplicitReturns": true,        // 函数必须有明确返回
+    "noImplicitReturns": true, // 函数必须有明确返回
     "noFallthroughCasesInSwitch": true, // switch 必须有 break
-    "noImplicitOverride": true,       // 覆盖方法需要 override 关键字
+    "noImplicitOverride": true // 覆盖方法需要 override 关键字
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
@@ -320,9 +312,10 @@ type Complex = Prettify<Pick<User, 'name' | 'email'> & { age: number }>
 // 鼠标悬停会显示: { name: string; email: string; age: number }
 
 // 检查两个类型是否相等
-type Equals<X, Y> = 
-  (<T>() => T extends X ? 1 : 2) extends 
-  (<T>() => T extends Y ? 1 : 2) ? true : false
+type Equals<X, Y> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
+    ? true
+    : false
 
 type Test = Equals<string, string> // true
 type Test2 = Equals<string, number> // false
@@ -335,13 +328,13 @@ type Test2 = Equals<string, number> // false
 function processUser(user: User | undefined) {
   // 使用可选链
   console.log(user?.name)
-  
+
   // 使用空值合并
   const name = user?.name ?? 'Anonymous'
-  
+
   // 使用类型断言（确定不为空时）
   const definitelyUser = user!
-  
+
   // 使用类型守卫
   if (user) {
     console.log(user.name) // 这里 user 不为 undefined
@@ -362,4 +355,4 @@ TypeScript 的类型系统非常强大，掌握这些技巧可以让你：
 
 ---
 
-*继续学习 TypeScript，让类型系统成为你的好朋友！* 🎯
+_继续学习 TypeScript，让类型系统成为你的好朋友！_ 🎯

@@ -7,20 +7,17 @@ interface TagCloudProps {
   showCount?: boolean
 }
 
-export default async function TagCloud({ 
-  className = "",
+export default async function TagCloud({
+  className = '',
   maxTags = 20,
-  showCount = false 
+  showCount = false,
 }: TagCloudProps) {
-  const [allTags, allPosts] = await Promise.all([
-    getAllTags(),
-    getAllPosts()
-  ])
+  const [allTags, allPosts] = await Promise.all([getAllTags(), getAllPosts()])
 
   // 计算每个标签的文章数量
   const tagCounts = allTags.map(tag => ({
     name: tag,
-    count: allPosts.filter(post => post.tags && post.tags.includes(tag)).length
+    count: allPosts.filter(post => post.tags && post.tags.includes(tag)).length,
   }))
 
   // 按文章数量排序，取前 maxTags 个
@@ -32,8 +29,9 @@ export default async function TagCloud({
   const getTagSize = (count: number) => {
     const maxCount = Math.max(...sortedTags.map(t => t.count))
     const minCount = Math.min(...sortedTags.map(t => t.count))
-    const ratio = maxCount === minCount ? 1 : (count - minCount) / (maxCount - minCount)
-    
+    const ratio =
+      maxCount === minCount ? 1 : (count - minCount) / (maxCount - minCount)
+
     // 字体大小范围：从 text-xs 到 text-lg
     if (ratio > 0.8) return 'text-lg'
     if (ratio > 0.6) return 'text-base'
@@ -44,8 +42,9 @@ export default async function TagCloud({
   const getTagOpacity = (count: number) => {
     const maxCount = Math.max(...sortedTags.map(t => t.count))
     const minCount = Math.min(...sortedTags.map(t => t.count))
-    const ratio = maxCount === minCount ? 1 : (count - minCount) / (maxCount - minCount)
-    
+    const ratio =
+      maxCount === minCount ? 1 : (count - minCount) / (maxCount - minCount)
+
     if (ratio > 0.8) return 'opacity-100'
     if (ratio > 0.6) return 'opacity-90'
     if (ratio > 0.4) return 'opacity-80'
@@ -58,7 +57,7 @@ export default async function TagCloud({
 
   return (
     <div className={`flex flex-wrap gap-3 ${className}`}>
-      {sortedTags.map((tag) => (
+      {sortedTags.map(tag => (
         <Link
           key={tag.name}
           href={`/tag/${encodeURIComponent(tag.name)}`}
@@ -71,9 +70,7 @@ export default async function TagCloud({
         >
           {tag.name}
           {showCount && (
-            <span className="ml-1 text-xs opacity-60">
-              ({tag.count})
-            </span>
+            <span className='ml-1 text-xs opacity-60'>({tag.count})</span>
           )}
         </Link>
       ))}

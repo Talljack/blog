@@ -1,10 +1,10 @@
 ---
-title: "Hello World - 我的第一篇博客"
-description: "欢迎来到我的博客！这是一篇介绍性文章，展示了博客的基本功能和写作风格。"
-date: "2024-01-01"
-tags: ["博客", "开始", "介绍"]
+title: 'Hello World - 我的第一篇博客'
+description: '欢迎来到我的博客！这是一篇介绍性文章，展示了博客的基本功能和写作风格。'
+date: '2024-01-01'
+tags: ['博客', '开始', '介绍']
 featured: true
-author: "作者"
+author: '作者'
 ---
 
 # 欢迎来到我的博客！
@@ -42,13 +42,9 @@ interface WelcomeProps {
 
 const Welcome: React.FC<WelcomeProps> = ({ name }) => {
   return (
-    <div className="p-4 bg-blue-100 rounded-lg">
-      <h1 className="text-2xl font-bold">
-        Hello, {name}! 👋
-      </h1>
-      <p className="mt-2 text-gray-600">
-        欢迎来到我的博客！
-      </p>
+    <div className='p-4 bg-blue-100 rounded-lg'>
+      <h1 className='text-2xl font-bold'>Hello, {name}! 👋</h1>
+      <p className='mt-2 text-gray-600'>欢迎来到我的博客！</p>
     </div>
   )
 }
@@ -76,4 +72,4 @@ export default Welcome
 
 ---
 
-*Happy coding! 🚀*
+_Happy coding! 🚀_

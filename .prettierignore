@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.next/
+.vercel/
+
+# Production builds
+dist/
+out/
+build/
+
+# Environment files
+.env*
+
+# Logs
+*.log
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+public/sitemap*.xml
+public/robots.txt
+public/feed.xml

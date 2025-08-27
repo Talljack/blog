@@ -70,8 +70,6 @@ module.exports = {
         disallow: '/',
       },
     ],
-    additionalSitemaps: [
-      'https://your-domain.com/sitemap.xml',
-    ],
+    additionalSitemaps: ['https://your-domain.com/sitemap.xml'],
   },
 }

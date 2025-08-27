@@ -60,8 +60,8 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
           },
         },
         datePublished: new Date(data.date).toISOString(),
-        dateModified: data.lastModified 
-          ? new Date(data.lastModified).toISOString() 
+        dateModified: data.lastModified
+          ? new Date(data.lastModified).toISOString()
           : new Date(data.date).toISOString(),
         mainEntityOfPage: {
           '@type': 'WebPage',
@@ -116,7 +116,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
 
   return (
     <script
-      type="application/ld+json"
+      type='application/ld+json'
       dangerouslySetInnerHTML={{
         __html: JSON.stringify(structuredData, null, 2),
       }}
