@@ -5,10 +5,12 @@ import { siteConfig } from '@/lib/config'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,
@@ -18,9 +20,22 @@ export const metadata: Metadata = {
   authors: [
     {
       name: siteConfig.author.name,
+      url: siteConfig.url,
     },
   ],
   creator: siteConfig.author.name,
+  publisher: siteConfig.author.name,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
     type: 'website',
     locale: 'zh_CN',
@@ -28,12 +43,21 @@ export const metadata: Metadata = {
     title: siteConfig.name,
     description: siteConfig.description,
     siteName: siteConfig.name,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: siteConfig.name,
     description: siteConfig.description,
-    creator: '@' + siteConfig.author.name,
+    creator: siteConfig.author.social.twitter ? `@${siteConfig.author.social.twitter.split('/').pop()}` : '@username',
+    images: [siteConfig.ogImage],
   },
   icons: {
     icon: '/favicon.ico',
@@ -41,6 +65,17 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   manifest: '/site.webmanifest',
+  alternates: {
+    canonical: siteConfig.url,
+    types: {
+      'application/rss+xml': `${siteConfig.url}/feed.xml`,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code', // 替换为你的Google验证码
+    // yandex: 'your-yandex-verification-code',
+    // other: 'your-other-verification-code',
+  },
 }
 
 export default function RootLayout({
@@ -50,7 +85,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        {/* 预连接重要资源 */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://giscus.app" />
+        
+        {/* DNS预取 */}
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+        
+        {/* 关键CSS预加载 */}
+        <link rel="preload" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css" as="style" />
+        
+        {/* 性能优化 */}
+        <meta name="theme-color" content="#ffffff" />
+        <meta name="color-scheme" content="light dark" />
+      </head>
       <body className={inter.className}>
+        <GoogleAnalytics />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

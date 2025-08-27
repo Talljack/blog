@@ -26,10 +26,13 @@ export const siteConfig = {
     description: '订阅获取最新文章',
   },
   giscus: {
-    repo: 'your-username/your-repo',
-    repoId: 'your-repo-id',
+    repo: 'Talljack/blog',
+    repoId: 'R_kgDOPknH_g',
     category: 'Announcements',
-    categoryId: 'your-category-id',
+    categoryId: 'DIC_kwDOPknH_s4CunIR',
+  },
+  analytics: {
+    googleAnalyticsId: 'G-N5Z6V1Q5RK',
   },
 }
 

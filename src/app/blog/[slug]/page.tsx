@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { getPostBySlug, getAllPosts } from '@/lib/blog'
 import { formatDateChinese } from '@/lib/utils'
 import { ArrowLeft, Calendar, Clock, Tag, User } from 'lucide-react'
 import Comments from '@/components/Comments'
+import StructuredData from '@/components/StructuredData'
 
 interface PostPageProps {
   params: Promise<{
@@ -18,25 +20,65 @@ export async function generateStaticParams() {
   }))
 }
 
-export async function generateMetadata({ params }: PostPageProps) {
+export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params
   const post = await getPostBySlug(slug)
   
   if (!post) {
     return {
       title: '文章未找到',
+      robots: {
+        index: false,
+        follow: false,
+      },
     }
   }
+
+  const publishedTime = new Date(post.date).toISOString()
+  const modifiedTime = post.lastModified 
+    ? new Date(post.lastModified).toISOString() 
+    : publishedTime
 
   return {
     title: post.title,
     description: post.description,
+    keywords: post.tags?.join(', '),
+    authors: [{ name: post.author || 'Anonymous' }],
     openGraph: {
       title: post.title,
       description: post.description,
       type: 'article',
-      publishedTime: post.date,
-      authors: [post.author || '作者'],
+      publishedTime,
+      modifiedTime,
+      authors: [post.author || 'Anonymous'],
+      tags: post.tags,
+      images: [
+        {
+          url: '/og-image.jpg', // 你可以为每篇文章设置特定的图片
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description,
+      images: ['/og-image.jpg'],
+    },
+    alternates: {
+      canonical: `/blog/${slug}`,
+    },
+    other: {
+      'article:author': post.author || 'Anonymous',
+      'article:published_time': publishedTime,
+      'article:modified_time': modifiedTime,
+      'article:section': 'Technology',
+      ...(post.tags?.reduce((acc, tag, index) => ({
+        ...acc,
+        [`article:tag:${index}`]: tag,
+      }), {})),
     },
   }
 }
@@ -50,7 +92,9 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-6 pb-16">
+    <>
+      <StructuredData type="article" data={post} />
+      <div className="max-w-2xl mx-auto px-6 pb-16">
       {/* 返回链接 - 简洁优雅 */}
       <div className="mb-8">
         <Link
@@ -166,6 +210,7 @@ export default async function PostPage({ params }: PostPageProps) {
         <div className="elegant-divider mb-8" />
         <Comments slug={post.slug} title={post.title} />
       </div>
-    </div>
+      </div>
+    </>
   )
 }

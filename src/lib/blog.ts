@@ -17,6 +17,7 @@ export interface BlogPost {
   tags: string[]
   author?: string
   featured?: boolean
+  lastModified?: string
 }
 
 export interface BlogPostMeta {
@@ -28,6 +29,7 @@ export interface BlogPostMeta {
   tags: string[]
   author?: string
   featured?: boolean
+  lastModified?: string
 }
 
 function ensurePostsDirectory() {
