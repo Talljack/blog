@@ -1,10 +1,10 @@
 'use client'
 
-import { siteConfig } from '@/lib/config'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import ThemeToggle from './ThemeToggle'
+import { siteConfig } from '@/lib/config'
 import Search from './Search'
+import ThemeToggle from './ThemeToggle'
 
 export default function Header() {
   const pathname = usePathname()

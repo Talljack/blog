@@ -1,17 +1,20 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { useTheme } from 'next-themes'
 import { siteConfig } from '@/lib/config'
+import { useTheme } from 'next-themes'
+import { useEffect, useRef } from 'react'
 
 interface CommentsProps {
   slug: string
   title: string
 }
 
-export default function Comments({ slug, title }: CommentsProps) {
+export default function Comments({
+  slug: _slug,
+  title: _title,
+}: CommentsProps) {
   const ref = useRef<HTMLDivElement>(null)
-  const { theme, resolvedTheme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   useEffect(() => {
     if (!ref.current) return

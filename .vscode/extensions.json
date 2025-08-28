@@ -1,0 +1,44 @@
+{
+  "recommendations": [
+    // === 代码质量和格式化 ===
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+
+    // === TypeScript 支持 ===
+    "ms-vscode.vscode-typescript-next",
+
+    // === React 和 Next.js 支持 ===
+    "ms-vscode.vscode-json",
+    "bradlc.vscode-tailwindcss",
+
+    // === 开发工具 ===
+    "ms-vscode.vscode-npm-script",
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+
+    // === Git 和协作 ===
+    "eamodio.gitlens",
+
+    // === 测试支持 ===
+    "ms-playwright.playwright",
+
+    // === 文件和语法高亮 ===
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    "ms-vscode.vscode-css-peek",
+
+    // === 开发体验增强 ===
+    "formulahendry.auto-rename-tag",
+    "streetsidesoftware.code-spell-checker",
+    "aaron-bond.better-comments",
+    "usernamehw.errorlens",
+
+    // === 主题和图标 ===
+    "vscode-icons-team.vscode-icons",
+
+    // === 其他实用工具 ===
+    "ms-vscode.hexeditor",
+    "humao.rest-client"
+  ],
+  "unwantedRecommendations": ["ms-vscode.vscode-json"]
+}

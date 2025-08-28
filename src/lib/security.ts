@@ -82,13 +82,13 @@ export function validateSlug(slug: string): boolean {
 }
 
 // 清理输入数据
-export function sanitizeInput(input: any): any {
+export function sanitizeInput(input: string | Object | null): any {
   if (typeof input === 'string') {
     // 移除潜在的危险字符
     return input.replace(/[<>\"'&]/g, '').trim()
   }
   if (typeof input === 'object' && input !== null) {
-    const sanitized: any = {}
+    const sanitized: Record<string, string> = {}
     for (const [key, value] of Object.entries(input)) {
       sanitized[key] = sanitizeInput(value)
     }
@@ -146,7 +146,7 @@ export function createErrorResponse(
 
 // 成功响应助手
 export function createSuccessResponse(
-  data: any,
+  data: Record<string, any> | Array<any>,
   status: number = 200,
   headers?: Record<string, string>
 ): Response {

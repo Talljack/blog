@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { NextRequest, NextResponse } from 'next/server'
 
 const STATS_FILE = path.join(process.cwd(), 'data', 'views.json')
 
 // 获取所有浏览量数据用于同步到GA
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const data = await fs.readFile(STATS_FILE, 'utf-8')
     const viewsData = JSON.parse(data)
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 }
 
 // 手动触发同步到Google Analytics
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const data = await fs.readFile(STATS_FILE, 'utf-8')
     const viewsData = JSON.parse(data)

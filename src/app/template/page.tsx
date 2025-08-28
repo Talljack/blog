@@ -55,7 +55,7 @@ export default function TemplatePage() {
                 {template.stars}
               </div>
               <div className='flex items-center'>
-                <div className='w-2 h-2 bg-blue-500 rounded-full mr-1'></div>
+                <div className='w-2 h-2 bg-blue-500 rounded-full mr-1' />
                 {template.language}
               </div>
               <div>更新于 {template.updated}</div>

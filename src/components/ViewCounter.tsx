@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Eye } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { sendPageView, sendViewCountEvent } from '@/lib/analytics'
 
 interface ViewCounterProps {

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
 
 test.describe('Manual View Counter Test', () => {
   test('debug view counter behavior', async ({ page }) => {

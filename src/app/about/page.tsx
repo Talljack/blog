@@ -1,5 +1,5 @@
-import { siteConfig } from '@/lib/config'
 import Link from 'next/link'
+import { siteConfig } from '@/lib/config'
 
 export const metadata = {
   title: '关于我',

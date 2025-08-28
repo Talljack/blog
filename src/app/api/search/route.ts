@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
 import Fuse from 'fuse.js'
+import { NextRequest, NextResponse } from 'next/server'
 import { getAllPosts } from '@/lib/blog'
 import { getAllCourses } from '@/lib/courses'
 import { getAllTemplates } from '@/lib/templates'

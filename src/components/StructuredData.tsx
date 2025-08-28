@@ -1,12 +1,26 @@
-import { siteConfig } from '@/lib/config'
 import { BlogPostMeta } from '@/lib/blog'
+import { siteConfig } from '@/lib/config'
 
 interface StructuredDataProps {
-  type: 'website' | 'article' | 'person' | 'organization'
-  data?: BlogPostMeta
+  type:
+    | 'website'
+    | 'article'
+    | 'person'
+    | 'organization'
+    | 'breadcrumb'
+    | 'faq'
+    | 'blog'
+  data?: BlogPostMeta | any
+  breadcrumbs?: Array<{ name: string; url: string }>
+  faq?: Array<{ question: string; answer: string }>
 }
 
-export default function StructuredData({ type, data }: StructuredDataProps) {
+export default function StructuredData({
+  type,
+  data,
+  breadcrumbs,
+  faq,
+}: StructuredDataProps) {
   let structuredData: any = {}
 
   switch (type) {
@@ -112,6 +126,71 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         ].filter(Boolean),
       }
       break
+
+    case 'blog':
+      structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'Blog',
+        name: siteConfig.name,
+        description: siteConfig.description,
+        url: `${siteConfig.url}/blog`,
+        author: {
+          '@type': 'Person',
+          name: siteConfig.author.name,
+          url: siteConfig.url,
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: siteConfig.name,
+          url: siteConfig.url,
+          logo: {
+            '@type': 'ImageObject',
+            url: `${siteConfig.url}/logo.png`,
+          },
+        },
+        inLanguage: 'zh-CN',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: `${siteConfig.url}/blog?q={search_term_string}`,
+          'query-input': 'required name=search_term_string',
+        },
+      }
+      break
+
+    case 'breadcrumb':
+      if (!breadcrumbs) break
+      structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbs.map((crumb, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: crumb.name,
+          item: crumb.url,
+        })),
+      }
+      break
+
+    case 'faq':
+      if (!faq) break
+      structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faq.map(item => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })),
+      }
+      break
+  }
+
+  // 如果没有结构化数据，不渲染
+  if (!structuredData['@type']) {
+    return null
   }
 
   return (

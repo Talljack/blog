@@ -1,1 +1,8 @@
-pnpm exec lint-staged
+# Run lint-staged for staged files
+npx lint-staged
+
+# Run type checking
+npm run type-check
+
+# Run tests (optional - uncomment if you want tests on every commit)
+# npm test

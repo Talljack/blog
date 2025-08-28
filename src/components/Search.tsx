@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { useDebounce } from 'use-debounce'
-import { Search as SearchIcon, X } from 'lucide-react'
-import Link from 'next/link'
 import { BlogPostMeta } from '@/lib/blog'
 import { Course } from '@/lib/courses'
 import { Template } from '@/lib/templates'
 import { formatDateChinese } from '@/lib/utils'
+import { Search as SearchIcon, X } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
+import { useDebounce } from 'use-debounce'
 
 type SearchResult =
   | (BlogPostMeta & { type: 'post' })
@@ -111,13 +111,6 @@ export default function Search({
     setTemplates([])
     setIsOpen(false)
     inputRef.current?.focus()
-  }
-
-  const highlightMatch = (text: string, matches?: any[]) => {
-    if (!matches || matches.length === 0) return text
-
-    // 简单的高亮实现
-    return text
   }
 
   return (

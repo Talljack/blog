@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
 import {
-  rateLimit,
-  validateApiRequest,
-  validateSlug,
-  sanitizeInput,
-  setCorsHeaders,
   createErrorResponse,
   createSuccessResponse,
+  rateLimit,
+  sanitizeInput,
+  setCorsHeaders,
+  validateApiRequest,
+  validateSlug,
 } from '@/lib/security'
+import { promises as fs } from 'fs'
+import { NextRequest } from 'next/server'
+import path from 'path'
 
 // 存储统计数据的文件路径
 const STATS_FILE = path.join(process.cwd(), 'data', 'views.json')
@@ -33,6 +33,7 @@ async function ensureStatsFile(): Promise<ViewsData> {
     try {
       await fs.mkdir(dataDir, { recursive: true })
     } catch (error) {
+      console.error('Error creating data directory:', error)
       // 目录可能已存在，忽略错误
     }
 
@@ -47,10 +48,10 @@ async function ensureStatsFile(): Promise<ViewsData> {
       }
 
       return parsed
-    } catch (error) {
+    } catch (_error) {
       console.warn(
         'Error reading stats file, creating new:',
-        error instanceof Error ? error.message : String(error)
+        _error instanceof Error ? _error.message : String(_error)
       )
       // 文件不存在或格式错误，创建空的统计数据
       const initialData: ViewsData = {}
@@ -61,8 +62,8 @@ async function ensureStatsFile(): Promise<ViewsData> {
       )
       return initialData
     }
-  } catch (error) {
-    console.error('Error ensuring stats file:', error)
+  } catch (_error) {
+    console.error('Error ensuring stats file:', _error)
     return {}
   }
 }
@@ -113,8 +114,8 @@ export async function GET(request: NextRequest) {
       const response = createSuccessResponse(limitedData)
       return setCorsHeaders(response, request.headers.get('origin'))
     }
-  } catch (error) {
-    console.error('Error reading views:', error)
+  } catch (_error) {
+    console.error('Error reading views:', _error)
     return createErrorResponse('Failed to get views', 500)
   }
 }
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
     let body
     try {
       body = await request.json()
-    } catch (error) {
+    } catch (_error) {
       return createErrorResponse('Invalid JSON in request body', 400)
     }
 
@@ -175,11 +176,11 @@ export async function POST(request: NextRequest) {
     try {
       await fs.writeFile(tempFile, JSON.stringify(viewsData, null, 2), 'utf-8')
       await fs.rename(tempFile, STATS_FILE)
-    } catch (error) {
+    } catch (_error) {
       // 清理临时文件
       try {
         await fs.unlink(tempFile)
-      } catch (cleanupError) {
+      } catch (_cleanupError) {
         // 忽略清理错误
       }
 
@@ -197,8 +198,8 @@ export async function POST(request: NextRequest) {
     })
 
     return setCorsHeaders(response, request.headers.get('origin'))
-  } catch (error) {
-    console.error('Error updating views:', error)
+  } catch (_error) {
+    console.error('Error updating views:', _error)
     return createErrorResponse('Failed to update views', 500)
   }
 }

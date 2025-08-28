@@ -1,4 +1,7 @@
 const { FlatCompat } = require('@eslint/eslintrc')
+const typescriptEslint = require('@typescript-eslint/eslint-plugin')
+const typescriptParser = require('@typescript-eslint/parser')
+const importPlugin = require('eslint-plugin-import')
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -9,11 +12,83 @@ module.exports = [
   ...compat.extends('next/core-web-vitals'),
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
+    plugins: {
+      '@typescript-eslint': typescriptEslint,
+      import: importPlugin,
+    },
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
     rules: {
-      // General rules
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      // === 代码质量规则 ===
+      'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       'prefer-const': 'error',
       'no-var': 'error',
+      'no-unused-vars': 'off', // TypeScript 处理
+      'no-undef': 'off', // TypeScript 处理
+      'no-duplicate-imports': 'error',
+      'no-unreachable': 'error',
+      'no-constant-condition': 'error',
+      'no-debugger': 'warn',
+
+      // === TypeScript 特定规则 ===
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrors: 'none',
+          destructuredArrayIgnorePattern: '^_',
+        },
+      ],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+
+      // === React 特定规则 ===
+      'react/jsx-key': 'error',
+      'react/jsx-no-duplicate-props': 'error',
+      'react/jsx-no-target-blank': 'error',
+      'react/no-children-prop': 'error',
+      'react/no-danger-with-children': 'error',
+      'react/no-deprecated': 'error',
+      'react/no-unescaped-entities': 'error',
+      'react/self-closing-comp': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+
+      // === 导入规则 ===
+      'import/no-default-export': 'off', // Next.js 需要默认导出
+
+      // === 代码风格规则 (由 Prettier 处理) ===
+      // 移除可能与 Prettier 冲突的规则
+
+      // === Next.js 特定规则 ===
+      '@next/next/no-img-element': 'error',
+      '@next/next/no-page-custom-font': 'error',
+      '@next/next/no-sync-scripts': 'error',
+      '@next/next/no-title-in-document-head': 'error',
+    },
+  },
+  {
+    files: ['**/*.test.{js,jsx,ts,tsx}', '**/tests/**/*.{js,jsx,ts,tsx}'],
+    rules: {
+      // 测试文件的特殊规则
+      'no-console': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
+    files: ['**/*.config.{js,ts}', '**/scripts/**/*.{js,ts}'],
+    rules: {
+      // 配置文件的特殊规则
+      'no-console': 'off',
+      '@typescript-eslint/no-var-requires': 'off',
     },
   },
   {
@@ -23,8 +98,13 @@ module.exports = [
       'node_modules/**',
       '.vercel/**',
       'public/**',
-      '*.config.*',
-      'playwright.config.ts',
+      'dist/**',
+      'build/**',
+      'coverage/**',
+      'test-results/**',
+      'playwright-report/**',
+      '*.min.js',
+      '*.bundle.js',
     ],
   },
 ]

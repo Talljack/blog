@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { getAllPosts } from '@/lib/blog'
 import { formatDateChinese } from '@/lib/utils'
-import { TrendingUp } from 'lucide-react'
 
 interface PopularPost {
   slug: string
@@ -69,8 +69,8 @@ export default function PopularPosts({
         <div className='space-y-3'>
           {Array.from({ length: limit }).map((_, index) => (
             <div key={index} className='animate-pulse'>
-              <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2'></div>
-              <div className='h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2'></div>
+              <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2' />
+              <div className='h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2' />
             </div>
           ))}
         </div>

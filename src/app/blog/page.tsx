@@ -1,6 +1,6 @@
-import { getAllPosts, getAllTags } from '@/lib/blog'
 import BlogCard from '@/components/BlogCard'
 import TagCloud from '@/components/TagCloud'
+import { getAllPosts, getAllTags } from '@/lib/blog'
 
 export const metadata = {
   title: '博客',

@@ -18,7 +18,7 @@ export default function CoursePage() {
                 <div className='flex items-center space-x-2 mb-3'>
                   {course.tags.map((tag, index) => (
                     <span key={index} className='flex items-center text-xs'>
-                      <span className='w-1.5 h-1.5 bg-gray-900 dark:bg-gray-100 rounded-full mr-2'></span>
+                      <span className='w-1.5 h-1.5 bg-gray-900 dark:bg-gray-100 rounded-full mr-2' />
                       {tag}
                     </span>
                   ))}

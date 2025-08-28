@@ -1,15 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import Script from 'next/script'
 import { siteConfig } from '@/lib/config'
-
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void
-    dataLayer: any[]
-  }
-}
+import Script from 'next/script'
 
 export default function GoogleAnalytics() {
   const GA_MEASUREMENT_ID = siteConfig.analytics?.googleAnalyticsId

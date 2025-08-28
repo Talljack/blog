@@ -1,9 +1,9 @@
-import { notFound } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { getAllPosts, getAllTags } from '@/lib/blog'
+import { notFound } from 'next/navigation'
 import BlogCard from '@/components/BlogCard'
-import { ArrowLeft } from 'lucide-react'
+import { getAllPosts, getAllTags } from '@/lib/blog'
 
 interface TagPageProps {
   params: Promise<{
