@@ -1,75 +1,145 @@
-import Fuse from 'fuse.js'
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllPosts } from '@/lib/blog'
-import { getAllCourses } from '@/lib/courses'
-import { getAllTemplates } from '@/lib/templates'
 
+// 搜索API端点
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const query = searchParams.get('q')
+  const type = searchParams.get('type') || 'posts' // posts, tags, all
 
   if (!query || query.trim() === '') {
-    return NextResponse.json({ results: [] })
+    return NextResponse.json({ error: '搜索关键词不能为空' }, { status: 400 })
   }
 
   try {
-    // 获取所有文章、课程和模板
+    const { getAllPosts } = await import('@/lib/blog')
     const posts = await getAllPosts()
-    const courses = getAllCourses()
-    const templates = getAllTemplates()
 
-    // 为文章添加类型标识
-    const postsWithType = posts.map(post => ({
-      ...post,
-      type: 'post' as const,
-    }))
+    const searchQuery = query.toLowerCase().trim()
+    let results: any[] = []
 
-    // 合并所有内容
-    const allContent = [...postsWithType, ...courses, ...templates]
+    if (type === 'posts' || type === 'all') {
+      // 搜索文章
+      const postResults = posts
+        .filter(post => {
+          const titleMatch = post.title.toLowerCase().includes(searchQuery)
+          const descMatch = post.description
+            ?.toLowerCase()
+            .includes(searchQuery)
+          const tagMatch = post.tags?.some(tag =>
+            tag.toLowerCase().includes(searchQuery)
+          )
+          const authorMatch = post.author?.toLowerCase().includes(searchQuery)
 
-    // 配置 Fuse.js 搜索选项
-    const fuseOptions = {
-      keys: [
-        { name: 'title', weight: 0.4 }, // 标题权重最高
-        { name: 'description', weight: 0.3 }, // 描述权重次之
-        { name: 'tags', weight: 0.2 }, // 标签权重
-        { name: 'author', weight: 0.1 }, // 作者权重最低
-      ],
-      threshold: 0.4, // 搜索敏感度 (0.0 = 完全匹配, 1.0 = 匹配所有)
-      distance: 100, // 最大搜索距离
-      minMatchCharLength: 2, // 最小匹配字符数
-      includeScore: true,
-      includeMatches: true,
+          return titleMatch || descMatch || tagMatch || authorMatch
+        })
+        .map(post => ({
+          type: 'post',
+          title: post.title,
+          description: post.description,
+          slug: post.slug,
+          date: post.date,
+          tags: post.tags,
+          author: post.author,
+          url: `/blog/${post.slug}`,
+          relevance: calculateRelevance(post, searchQuery),
+        }))
+
+      results = [...results, ...postResults]
     }
 
-    // 创建 Fuse 搜索实例
-    const fuse = new Fuse(allContent, fuseOptions)
+    if (type === 'tags' || type === 'all') {
+      // 搜索标签
+      const allTags = Array.from(
+        new Set(posts.flatMap(post => post.tags || []))
+      )
+      const tagResults = allTags
+        .filter(tag => tag.toLowerCase().includes(searchQuery))
+        .map(tag => {
+          const postsWithTag = posts.filter(post => post.tags?.includes(tag))
+          return {
+            type: 'tag',
+            title: `#${tag}`,
+            description: `${postsWithTag.length} 篇文章`,
+            url: `/tag/${encodeURIComponent(tag)}`,
+            postCount: postsWithTag.length,
+            relevance: tag.toLowerCase() === searchQuery ? 1 : 0.8,
+          }
+        })
 
-    // 执行搜索
-    const searchResults = fuse.search(query).slice(0, 10) // 限制返回10个结果
+      results = [...results, ...tagResults]
+    }
 
-    // 格式化搜索结果，按类型分组
-    const results = searchResults.map(result => ({
-      ...result.item,
-      score: result.score,
-      matches: result.matches,
-    }))
+    // 按相关度排序
+    results.sort((a, b) => (b.relevance || 0) - (a.relevance || 0))
 
-    // 分类结果
-    const posts_results = results.filter(item => item.type === 'post')
-    const courses_results = results.filter(item => item.type === 'course')
-    const templates_results = results.filter(item => item.type === 'template')
+    // 限制结果数量
+    const maxResults = parseInt(searchParams.get('limit') || '10', 10)
+    results = results.slice(0, maxResults)
 
-    return NextResponse.json({
-      results,
-      posts: posts_results,
-      courses: courses_results,
-      templates: templates_results,
-      query,
-      total: searchResults.length,
-    })
+    return NextResponse.json(
+      {
+        query,
+        type,
+        total: results.length,
+        results,
+      },
+      {
+        headers: {
+          'Cache-Control': 'public, max-age=300, s-maxage=300', // 5分钟缓存
+        },
+      }
+    )
   } catch (error) {
-    console.error('Search error:', error)
-    return NextResponse.json({ error: 'Search failed' }, { status: 500 })
+    console.error('Search API error:', error)
+    return NextResponse.json({ error: '搜索服务暂时不可用' }, { status: 500 })
   }
+}
+
+function calculateRelevance(post: any, query: string): number {
+  let score = 0
+  const queryLower = query.toLowerCase()
+
+  // 标题匹配权重最高
+  if (post.title.toLowerCase().includes(queryLower)) {
+    score += 1.0
+    if (post.title.toLowerCase() === queryLower) {
+      score += 0.5 // 完全匹配额外加分
+    }
+  }
+
+  // 描述匹配
+  if (post.description?.toLowerCase().includes(queryLower)) {
+    score += 0.6
+  }
+
+  // 标签匹配
+  if (
+    post.tags?.some((tag: string) => tag.toLowerCase().includes(queryLower))
+  ) {
+    score += 0.4
+    if (post.tags?.some((tag: string) => tag.toLowerCase() === queryLower)) {
+      score += 0.3 // 完全匹配标签额外加分
+    }
+  }
+
+  // 作者匹配
+  if (post.author?.toLowerCase().includes(queryLower)) {
+    score += 0.2
+  }
+
+  // 文章新鲜度加分
+  const daysSincePublished = Math.floor(
+    (new Date().getTime() - new Date(post.date).getTime()) /
+      (1000 * 60 * 60 * 24)
+  )
+  if (daysSincePublished < 30) {
+    score += 0.1
+  }
+
+  // 特色文章加分
+  if (post.featured) {
+    score += 0.1
+  }
+
+  return Math.min(score, 2.0) // 最高分数限制为2.0
 }

@@ -7,7 +7,26 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/admin/', '/_next/', '/private/'],
+        disallow: [
+          '/api/',
+          '/admin/',
+          '/_next/',
+          '/private/',
+          '/*.json$',
+          '/search*',
+          '/tmp/',
+        ],
+      },
+      {
+        userAgent: 'Baiduspider',
+        allow: '/',
+        disallow: ['/api/', '/admin/', '/_next/', '/private/', '/tmp/'],
+        crawlDelay: 1,
+      },
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/api/', '/admin/', '/_next/', '/private/', '/tmp/'],
       },
       {
         userAgent: ['GPTBot', 'Google-Extended', 'CCBot'],

@@ -10,9 +10,29 @@ interface StructuredDataProps {
     | 'breadcrumb'
     | 'faq'
     | 'blog'
+    | 'course'
+    | 'softwareApplication'
+    | 'howTo'
+    | 'techArticle'
+    | 'webPage'
   data?: BlogPostMeta | any
   breadcrumbs?: Array<{ name: string; url: string }>
   faq?: Array<{ question: string; answer: string }>
+  courseData?: {
+    title: string
+    description: string
+    instructor: string
+    duration?: string
+    difficulty?: 'Beginner' | 'Intermediate' | 'Advanced'
+    tags?: string[]
+  }
+  howToSteps?: Array<{ name: string; text: string; image?: string }>
+  webPageData?: {
+    title: string
+    description: string
+    url: string
+    lastModified?: string
+  }
 }
 
 export default function StructuredData({
@@ -20,6 +40,9 @@ export default function StructuredData({
   data,
   breadcrumbs,
   faq,
+  courseData,
+  howToSteps,
+  webPageData,
 }: StructuredDataProps) {
   let structuredData: any = {}
 
@@ -83,8 +106,18 @@ export default function StructuredData({
         },
         keywords: data.tags?.join(', ') || '',
         wordCount: Math.ceil((data.readTime || 5) * 200),
-        articleSection: 'Technology',
+        articleSection: data.category || 'Technology',
         inLanguage: 'zh-CN',
+        isAccessibleForFree: true,
+        genre: data.tags || ['Technology', 'Programming'],
+        about: {
+          '@type': 'Thing',
+          name: data.tags?.[0] || 'Technology',
+        },
+        audience: {
+          '@type': 'Audience',
+          audienceType: 'Developers',
+        },
       }
       break
 
@@ -186,6 +219,161 @@ export default function StructuredData({
         })),
       }
       break
+
+    case 'course':
+      if (!courseData) break
+      structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        name: courseData.title,
+        description: courseData.description,
+        provider: {
+          '@type': 'Organization',
+          name: siteConfig.name,
+          url: siteConfig.url,
+        },
+        instructor: {
+          '@type': 'Person',
+          name: courseData.instructor || siteConfig.author.name,
+        },
+        educationalLevel: courseData.difficulty || 'Intermediate',
+        timeRequired: courseData.duration || 'P1W',
+        coursePrerequisites: courseData.tags?.join(', ') || '',
+        inLanguage: 'zh-CN',
+        isAccessibleForFree: true,
+        teaches: courseData.tags || [],
+      }
+      break
+
+    case 'softwareApplication':
+      structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: siteConfig.name,
+        description: siteConfig.description,
+        url: siteConfig.url,
+        applicationCategory: 'WebApplication',
+        operatingSystem: 'Web Browser',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'CNY',
+        },
+        author: {
+          '@type': 'Person',
+          name: siteConfig.author.name,
+        },
+      }
+      break
+
+    case 'howTo':
+      if (!howToSteps) break
+      structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'HowTo',
+        name: data?.title || 'How To Guide',
+        description: data?.description || '',
+        image: `${siteConfig.url}/og-image.jpg`,
+        estimatedCost: {
+          '@type': 'MonetaryAmount',
+          currency: 'CNY',
+          value: '0',
+        },
+        step: howToSteps.map((step, index) => ({
+          '@type': 'HowToStep',
+          position: index + 1,
+          name: step.name,
+          text: step.text,
+          image: step.image,
+        })),
+        totalTime: 'PT30M',
+      }
+      break
+
+    case 'techArticle':
+      if (!data) break
+      structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'TechArticle',
+        headline: data.title,
+        description: data.description,
+        image: `${siteConfig.url}/og-image.jpg`,
+        author: {
+          '@type': 'Person',
+          name: data.author || siteConfig.author.name,
+          url: siteConfig.author.social.github || siteConfig.url,
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: siteConfig.name,
+          url: siteConfig.url,
+          logo: {
+            '@type': 'ImageObject',
+            url: `${siteConfig.url}/logo.png`,
+          },
+        },
+        datePublished: new Date(data.date).toISOString(),
+        dateModified: data.lastModified
+          ? new Date(data.lastModified).toISOString()
+          : new Date(data.date).toISOString(),
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': `${siteConfig.url}/blog/${data.slug}`,
+        },
+        keywords: data.tags?.join(', ') || '',
+        dependencies: 'Basic programming knowledge',
+        proficiencyLevel: 'Intermediate',
+        isAccessibleForFree: true,
+      }
+      break
+
+    case 'webPage':
+      const pageData = webPageData || data
+      if (!pageData) break
+      structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: pageData.title,
+        description: pageData.description,
+        url: pageData.url || `${siteConfig.url}`,
+        inLanguage: 'zh-CN',
+        isPartOf: {
+          '@type': 'WebSite',
+          name: siteConfig.name,
+          url: siteConfig.url,
+        },
+        author: {
+          '@type': 'Person',
+          name: siteConfig.author.name,
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: siteConfig.name,
+          url: siteConfig.url,
+        },
+        dateModified: pageData.lastModified
+          ? new Date(pageData.lastModified).toISOString()
+          : new Date().toISOString(),
+        mainContentOfPage: {
+          '@type': 'WebPageElement',
+          cssSelector: 'main',
+        },
+      }
+      break
+  }
+
+  // 添加通用的 WebSite 数据到所有类型
+  if (structuredData['@type'] && type !== 'website') {
+    structuredData.mainEntityOfPage = structuredData.mainEntityOfPage || {
+      '@type': 'WebPage',
+      '@id':
+        typeof window !== 'undefined' ? window.location.href : siteConfig.url,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: siteConfig.name,
+        url: siteConfig.url,
+      },
+    }
   }
 
   // 如果没有结构化数据，不渲染

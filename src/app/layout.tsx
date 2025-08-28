@@ -4,27 +4,25 @@ import './globals.css'
 import Footer from '@/components/Footer'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import Header from '@/components/Header'
+import SEOOptimizer from '@/components/SEOOptimizer'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { siteConfig } from '@/lib/config'
+import { getDefaultMetadata } from '@/lib/metadata'
 
 const inter = Inter({ subsets: ['latin'] })
 
+// 使用增强的元数据生成系统
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
+  ...getDefaultMetadata(),
+  metadataBase: new URL(process.env.SITE_URL || siteConfig.url),
+
+  // 模板设置 - 允许子页面自定义标题
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,
   },
-  description: siteConfig.description,
-  keywords: siteConfig.seo.keywords,
-  authors: [
-    {
-      name: siteConfig.author.name,
-      url: siteConfig.url,
-    },
-  ],
-  creator: siteConfig.author.name,
-  publisher: siteConfig.author.name,
+
+  // 增强的robots设置
   robots: {
     index: true,
     follow: true,
@@ -36,47 +34,53 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  openGraph: {
-    type: 'website',
-    locale: 'zh_CN',
-    url: siteConfig.url,
-    title: siteConfig.name,
-    description: siteConfig.description,
-    siteName: siteConfig.name,
-    images: [
-      {
-        url: siteConfig.ogImage,
-        width: 1200,
-        height: 630,
-        alt: siteConfig.name,
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: siteConfig.name,
-    description: siteConfig.description,
-    creator: siteConfig.author.social.twitter
-      ? `@${siteConfig.author.social.twitter.split('/').pop()}`
-      : '@username',
-    images: [siteConfig.ogImage],
-  },
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png',
-  },
-  manifest: '/site.webmanifest',
+
+  // RSS和替代格式
   alternates: {
-    canonical: siteConfig.url,
+    canonical: process.env.SITE_URL || siteConfig.url,
     types: {
-      'application/rss+xml': `${siteConfig.url}/feed.xml`,
+      'application/rss+xml': `${process.env.SITE_URL || siteConfig.url}/feed.xml`,
+    },
+    languages: {
+      'zh-CN': process.env.SITE_URL || siteConfig.url,
     },
   },
+
+  // 验证标签
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
-    // yandex: process.env.YANDEX_SITE_VERIFICATION,
-    // other: process.env.OTHER_SITE_VERIFICATION,
+    other: {
+      'baidu-site-verification': [process.env.BAIDU_SITE_VERIFICATION || ''],
+      'msvalidate.01': [process.env.BING_SITE_VERIFICATION || ''],
+    },
+  },
+
+  // 分类
+  category: 'Technology',
+
+  // 应用程序信息
+  applicationName: siteConfig.name,
+
+  // 引用策略
+  referrer: 'origin-when-cross-origin',
+
+  // 格式检测
+  formatDetection: {
+    telephone: false,
+    date: false,
+    address: false,
+    email: false,
+    url: false,
+  },
+
+  // 其他有用的元数据
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'format-detection': 'telephone=no',
+    'msapplication-TileColor': '#3b82f6',
+    'msapplication-config': '/browserconfig.xml',
   },
 }
 
@@ -108,12 +112,34 @@ export default function RootLayout({
           as='style'
         />
 
-        {/* 性能优化 */}
-        <meta name='theme-color' content='#ffffff' />
+        {/* 性能优化和主题设置 */}
+        <meta
+          name='theme-color'
+          content='#3b82f6'
+          media='(prefers-color-scheme: light)'
+        />
+        <meta
+          name='theme-color'
+          content='#1e293b'
+          media='(prefers-color-scheme: dark)'
+        />
         <meta name='color-scheme' content='light dark' />
+
+        {/* PWA支持 */}
+        <meta name='mobile-web-app-capable' content='yes' />
+        <meta name='apple-mobile-web-app-capable' content='yes' />
+        <meta
+          name='apple-mobile-web-app-status-bar-style'
+          content='black-translucent'
+        />
+
+        {/* Microsoft Tiles */}
+        <meta name='msapplication-TileColor' content='#3b82f6' />
+        <meta name='msapplication-TileImage' content='/ms-icon-144x144.png' />
       </head>
       <body className={inter.className}>
         <GoogleAnalytics />
+        <SEOOptimizer />
         <ThemeProvider
           attribute='class'
           defaultTheme='system'
@@ -122,7 +148,14 @@ export default function RootLayout({
         >
           <div className='relative min-h-screen flex flex-col'>
             <Header />
-            <main className='flex-1'>{children}</main>
+            <main
+              id='main-content'
+              className='flex-1'
+              role='main'
+              aria-label='主要内容'
+            >
+              {children}
+            </main>
             <Footer />
           </div>
         </ThemeProvider>
