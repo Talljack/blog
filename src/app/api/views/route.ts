@@ -172,8 +172,24 @@ export async function POST(request: NextRequest) {
 
     // 原子性保存数据
     const tempFile = `${STATS_FILE}.tmp`
-    await fs.writeFile(tempFile, JSON.stringify(viewsData, null, 2), 'utf-8')
-    await fs.rename(tempFile, STATS_FILE)
+    try {
+      await fs.writeFile(tempFile, JSON.stringify(viewsData, null, 2), 'utf-8')
+      await fs.rename(tempFile, STATS_FILE)
+    } catch (error) {
+      // 清理临时文件
+      try {
+        await fs.unlink(tempFile)
+      } catch (cleanupError) {
+        // 忽略清理错误
+      }
+
+      // 如果原子操作失败，直接写入原文件
+      await fs.writeFile(
+        STATS_FILE,
+        JSON.stringify(viewsData, null, 2),
+        'utf-8'
+      )
+    }
 
     const response = createSuccessResponse({
       slug,

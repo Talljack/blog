@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Eye } from 'lucide-react'
+import { sendPageView, sendViewCountEvent } from '@/lib/analytics'
 
 interface ViewCounterProps {
   slug: string
@@ -18,71 +19,84 @@ export default function ViewCounter({
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const fetchViews = async () => {
+    const fetchAndTrackViews = async () => {
+      if (!slug || !slug.trim()) {
+        setIsLoading(false)
+        setViews(0)
+        return
+      }
+
       try {
-        // 获取当前浏览量
-        const response = await fetch(
-          `/api/views?slug=${encodeURIComponent(slug)}`,
-          {
-            headers: {
-              'User-Agent': navigator.userAgent || 'ViewCounter/1.0',
-            },
-          }
-        )
+        const viewKey = `viewed-${slug}`
+        const gaViewKey = `ga-viewed-${slug}`
+        const shouldIncrement = increment && !sessionStorage.getItem(viewKey)
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
+        let postSucceeded = false
 
-        const result = await response.json()
+        // 如果需要增加浏览量，先发POST请求
+        if (shouldIncrement) {
+          try {
+            const postResponse = await fetch('/api/views', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': navigator.userAgent || 'ViewCounter/1.0',
+              },
+              body: JSON.stringify({ slug }),
+            })
 
-        // 处理新的API响应格式
-        if (result.success && result.data) {
-          setViews(result.data.views || 0)
-        } else {
-          // 兼容旧格式
-          setViews(result.views || 0)
-        }
-
-        // 如果需要增加浏览量
-        if (increment) {
-          // 防止重复增加（使用 sessionStorage）
-          const viewKey = `viewed-${slug}`
-          if (!sessionStorage.getItem(viewKey)) {
-            try {
-              const postResponse = await fetch('/api/views', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'User-Agent': navigator.userAgent || 'ViewCounter/1.0',
-                },
-                body: JSON.stringify({ slug }),
-              })
-
-              if (postResponse.ok) {
-                const postResult = await postResponse.json()
-
-                // 标记为已查看
-                sessionStorage.setItem(viewKey, 'true')
-
-                // 更新显示的浏览量
-                if (postResult.success && postResult.data) {
-                  setViews(postResult.data.views || 0)
-                } else if (postResult.views) {
-                  setViews(postResult.views)
-                } else {
-                  setViews(prev => (prev || 0) + 1)
-                }
-              } else {
-                console.warn(
-                  'Failed to increment view count:',
-                  postResponse.status
-                )
+            if (postResponse.ok) {
+              const postResult = await postResponse.json()
+              if (postResult.success && postResult.data) {
+                setViews(postResult.data.views || 0)
+                postSucceeded = true
               }
-            } catch (error) {
-              console.warn('Error incrementing views:', error)
-              // 静默失败，仍显示当前浏览量
+
+              // 标记为已查看
+              sessionStorage.setItem(viewKey, 'true')
+
+              // 发送Google Analytics事件（包含实际浏览量数据）
+              if (!sessionStorage.getItem(gaViewKey)) {
+                const currentViews = postResult.data.views || 0
+
+                // 发送页面浏览事件和浏览量增量事件
+                sendPageView(slug, currentViews)
+                sendViewCountEvent(slug, currentViews, true) // true表示这是新的浏览
+
+                sessionStorage.setItem(gaViewKey, 'true')
+              }
             }
+          } catch (error) {
+            console.warn('Error incrementing views:', error)
+          }
+        }
+
+        // 如果没有增量操作或增量操作失败，获取当前浏览量
+        if (!postSucceeded) {
+          const response = await fetch(
+            `/api/views?slug=${encodeURIComponent(slug)}`,
+            {
+              headers: {
+                'User-Agent': navigator.userAgent || 'ViewCounter/1.0',
+              },
+            }
+          )
+
+          if (response.ok) {
+            const result = await response.json()
+            const currentViews = result.success
+              ? result.data.views || 0
+              : result.views || 0
+            setViews(currentViews)
+
+            // 对于非增量访问，也发送浏览量数据到GA（仅首次）
+            const gaViewKey = `ga-viewed-${slug}`
+            if (!sessionStorage.getItem(gaViewKey)) {
+              sendViewCountEvent(slug, currentViews, false) // false表示只是查看，不是新增
+              sessionStorage.setItem(gaViewKey, 'true')
+            }
+          } else {
+            setViews(0)
           }
         }
       } catch (error) {
@@ -93,12 +107,7 @@ export default function ViewCounter({
       }
     }
 
-    if (slug && slug.trim()) {
-      fetchViews()
-    } else {
-      setIsLoading(false)
-      setViews(0)
-    }
+    fetchAndTrackViews()
   }, [slug, increment])
 
   if (isLoading) {
