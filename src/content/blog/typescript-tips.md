@@ -3,7 +3,7 @@ title: 'TypeScript 开发实用技巧'
 description: '分享一些在日常 TypeScript 开发中非常实用的技巧和最佳实践，帮助你写出更好的类型安全代码。'
 date: '2024-01-03'
 tags: ['TypeScript', 'JavaScript', '开发技巧', '类型安全']
-author: '作者'
+author: 'Talljack'
 ---
 
 # TypeScript 开发实用技巧

@@ -1,5 +1,3 @@
-// Upstash Redis版本的Views API
-import { Redis } from '@upstash/redis'
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -9,14 +7,16 @@ import {
   validateApiRequest,
   validateSlug,
 } from '@/lib/security'
-import { NextRequest } from 'next/server'
-
-// 本地开发时的文件存储fallback
 import { promises as fs } from 'fs'
+import { NextRequest } from 'next/server'
 import path from 'path'
 
+// 存储统计数据的文件路径
 const STATS_FILE = path.join(process.cwd(), 'data', 'views.json')
-const KV_PREFIX = 'blog:views:'
+
+interface ViewsData {
+  [slug: string]: number
+}
 
 // 配置速率限制
 const viewsRateLimit = rateLimit({
@@ -24,65 +24,37 @@ const viewsRateLimit = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15分钟
 })
 
-// 判断是否在Vercel环境中并配置Redis客户端
-const redis = Redis.fromEnv()
-
-const isVercelEnvironment = () => {
-  return process.env.VERCEL === '1' && process.env.KV_REST_API_URL
-}
-
-// Upstash Redis存储操作
-async function getViewsFromKV(
-  slug?: string
-): Promise<number | Record<string, number>> {
-  if (slug) {
-    const views = await redis.get(`${KV_PREFIX}${slug}`)
-    return typeof views === 'number' ? views : 0
-  } else {
-    // 获取所有浏览量数据
-    const keys = await redis.keys(`${KV_PREFIX}*`)
-    const pipeline = redis.pipeline()
-    keys.forEach(key => pipeline.get(key))
-    const values = await pipeline.exec()
-
-    const result: Record<string, number> = {}
-    keys.forEach((key, index) => {
-      const slug = key.replace(KV_PREFIX, '')
-      const views = values[index]
-      result[slug] = typeof views === 'number' ? views : 0
-    })
-
-    return result
-  }
-}
-
-async function incrementViewsInKV(slug: string): Promise<number> {
-  const newViews = await redis.incr(`${KV_PREFIX}${slug}`)
-  return newViews
-}
-
-// 本地文件存储操作（开发环境fallback）
-async function ensureStatsFile(): Promise<Record<string, number>> {
+// 确保数据目录和文件存在
+async function ensureStatsFile(): Promise<ViewsData> {
   try {
     const dataDir = path.dirname(STATS_FILE)
 
+    // 确保目录存在
     try {
       await fs.mkdir(dataDir, { recursive: true })
     } catch (error) {
+      console.error('Error creating data directory:', error)
       // 目录可能已存在，忽略错误
     }
 
+    // 尝试读取现有文件
     try {
       const data = await fs.readFile(STATS_FILE, 'utf-8')
       const parsed = JSON.parse(data)
 
+      // 验证数据结构
       if (typeof parsed !== 'object' || parsed === null) {
         throw new Error('Invalid data structure')
       }
 
       return parsed
     } catch (_error) {
-      const initialData: Record<string, number> = {}
+      console.warn(
+        'Error reading stats file, creating new:',
+        _error instanceof Error ? _error.message : String(_error)
+      )
+      // 文件不存在或格式错误，创建空的统计数据
+      const initialData: ViewsData = {}
       await fs.writeFile(
         STATS_FILE,
         JSON.stringify(initialData, null, 2),
@@ -96,67 +68,9 @@ async function ensureStatsFile(): Promise<Record<string, number>> {
   }
 }
 
-async function getViewsFromFile(
-  slug?: string
-): Promise<number | Record<string, number>> {
-  const viewsData = await ensureStatsFile()
-
-  if (slug) {
-    return viewsData[slug] || 0
-  } else {
-    return viewsData
-  }
-}
-
-async function incrementViewsInFile(slug: string): Promise<number> {
-  const viewsData = await ensureStatsFile()
-  const currentViews = viewsData[slug] || 0
-
-  if (currentViews >= Number.MAX_SAFE_INTEGER - 1) {
-    throw new Error('Views count overflow')
-  }
-
-  viewsData[slug] = currentViews + 1
-
-  // 原子性保存
-  const tempFile = `${STATS_FILE}.tmp`
-  try {
-    await fs.writeFile(tempFile, JSON.stringify(viewsData, null, 2), 'utf-8')
-    await fs.rename(tempFile, STATS_FILE)
-  } catch (_error) {
-    try {
-      await fs.unlink(tempFile)
-    } catch (_cleanupError) {
-      // 忽略清理错误
-    }
-
-    await fs.writeFile(STATS_FILE, JSON.stringify(viewsData, null, 2), 'utf-8')
-  }
-
-  return viewsData[slug]
-}
-
-// 统一的存储接口
-async function getViews(
-  slug?: string
-): Promise<number | Record<string, number>> {
-  if (isVercelEnvironment()) {
-    return await getViewsFromKV(slug)
-  } else {
-    return await getViewsFromFile(slug)
-  }
-}
-
-async function incrementViews(slug: string): Promise<number> {
-  if (isVercelEnvironment()) {
-    return await incrementViewsInKV(slug)
-  } else {
-    return await incrementViewsInFile(slug)
-  }
-}
-
-// GET: 获取浏览量
+// 获取文章浏览量
 export async function GET(request: NextRequest) {
+  // 应用速率限制
   const rateLimitResult = viewsRateLimit(request)
   if (!rateLimitResult.allowed) {
     return createErrorResponse('Rate limit exceeded', 429, {
@@ -166,6 +80,7 @@ export async function GET(request: NextRequest) {
     })
   }
 
+  // 验证请求
   const validation = validateApiRequest(request)
   if (!validation.valid) {
     return createErrorResponse(validation.error || 'Invalid request', 400)
@@ -175,31 +90,28 @@ export async function GET(request: NextRequest) {
   const slug = searchParams.get('slug')
 
   try {
+    const viewsData = await ensureStatsFile()
+
     if (slug) {
+      // 验证 slug
       if (!validateSlug(slug)) {
         return createErrorResponse('Invalid slug format', 400)
       }
 
       const sanitizedSlug = sanitizeInput(slug)
-      const views = (await getViews(sanitizedSlug)) as number
-
       const response = createSuccessResponse({
         slug: sanitizedSlug,
-        views,
-        storage: isVercelEnvironment() ? 'redis' : 'file',
+        views: viewsData[sanitizedSlug] || 0,
       })
 
       return setCorsHeaders(response, request.headers.get('origin'))
     } else {
-      const allViews = (await getViews()) as Record<string, number>
+      // 返回所有文章的浏览量（限制数量以防止数据泄露）
       const limitedData = Object.fromEntries(
-        Object.entries(allViews).slice(0, 100)
+        Object.entries(viewsData).slice(0, 100)
       )
 
-      const response = createSuccessResponse({
-        ...limitedData,
-        storage: isVercelEnvironment() ? 'redis' : 'file',
-      })
+      const response = createSuccessResponse(limitedData)
       return setCorsHeaders(response, request.headers.get('origin'))
     }
   } catch (_error) {
@@ -208,11 +120,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: 增加浏览量
+// 增加文章浏览量
 export async function POST(request: NextRequest) {
+  // 应用速率限制（POST请求更严格的限制）
   const rateLimitResult = rateLimit({
     maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '50'),
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'), // 15分钟
   })(request)
 
   if (!rateLimitResult.allowed) {
@@ -223,6 +136,7 @@ export async function POST(request: NextRequest) {
     })
   }
 
+  // 验证请求
   const validation = validateApiRequest(request)
   if (!validation.valid) {
     return createErrorResponse(validation.error || 'Invalid request', 400)
@@ -242,16 +156,45 @@ export async function POST(request: NextRequest) {
       return createErrorResponse('Slug is required', 400)
     }
 
+    // 验证 slug 格式
     if (!validateSlug(slug)) {
       return createErrorResponse('Invalid slug format', 400)
     }
 
-    const newViews = await incrementViews(slug)
+    const viewsData = await ensureStatsFile()
+
+    // 增加浏览量（防止整数溢出）
+    const currentViews = viewsData[slug] || 0
+    if (currentViews >= Number.MAX_SAFE_INTEGER - 1) {
+      return createErrorResponse('Views count overflow', 400)
+    }
+
+    viewsData[slug] = currentViews + 1
+
+    // 原子性保存数据
+    const tempFile = `${STATS_FILE}.tmp`
+    try {
+      await fs.writeFile(tempFile, JSON.stringify(viewsData, null, 2), 'utf-8')
+      await fs.rename(tempFile, STATS_FILE)
+    } catch (_error) {
+      // 清理临时文件
+      try {
+        await fs.unlink(tempFile)
+      } catch (_cleanupError) {
+        // 忽略清理错误
+      }
+
+      // 如果原子操作失败，直接写入原文件
+      await fs.writeFile(
+        STATS_FILE,
+        JSON.stringify(viewsData, null, 2),
+        'utf-8'
+      )
+    }
 
     const response = createSuccessResponse({
       slug,
-      views: newViews,
-      storage: isVercelEnvironment() ? 'kv' : 'file',
+      views: viewsData[slug],
     })
 
     return setCorsHeaders(response, request.headers.get('origin'))
@@ -261,7 +204,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// OPTIONS: CORS预检
+// 处理 OPTIONS 请求（用于 CORS 预检）
 export async function OPTIONS(request: NextRequest) {
   const response = new Response(null, { status: 200 })
   return setCorsHeaders(response, request.headers.get('origin'))

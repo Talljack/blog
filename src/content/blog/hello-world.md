@@ -4,7 +4,7 @@ description: '欢迎来到我的博客！这是一篇介绍性文章，展示了
 date: '2024-01-01'
 tags: ['博客', '开始', '介绍']
 featured: true
-author: '作者'
+author: 'Talljack'
 ---
 
 # 欢迎来到我的博客！

@@ -4,7 +4,7 @@ description: '深入了解如何使用 Playwright 进行现代 Web 应用的端�
 date: '2024-01-04'
 tags: ['Playwright', '测试', 'E2E', 'Web开发', '自动化']
 featured: true
-author: '作者'
+author: 'Talljack'
 ---
 
 # Playwright 端到端测试完全指南

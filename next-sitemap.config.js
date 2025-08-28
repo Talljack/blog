@@ -1,5 +1,15 @@
-const { getAllPosts } = require('./src/lib/blog')
-const { siteConfig } = require('./src/lib/config')
+// Import functions for sitemap generation
+let getAllPosts, siteConfig
+try {
+  ;({ getAllPosts } = require('./src/lib/blog'))(
+    ({ siteConfig } = require('./src/lib/config'))
+  )
+} catch (error) {
+  console.warn('Could not load blog or config modules:', error.message)
+  // Fallback values
+  getAllPosts = () => Promise.resolve([])
+  siteConfig = { url: 'https://talljack.me' }
+}
 
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {

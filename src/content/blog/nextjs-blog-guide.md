@@ -4,7 +4,7 @@ description: '详细介绍如何使用 Next.js 15、TypeScript 和 Tailwind CSS 
 date: '2024-01-02'
 tags: ['Next.js', 'React', 'TypeScript', '博客', '教程']
 featured: true
-author: '作者'
+author: 'Talljack'
 ---
 
 # 使用 Next.js 构建现代化博客系统

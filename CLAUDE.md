@@ -6,20 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Core Development
 
-- `npm run dev` - Start development server on localhost:3000
-- `npm run build` - Build production version and generate sitemap
-- `npm start` - Start production server
-- `npm run lint` - Run ESLint for code quality checks
+- `pnpm run dev` - Start development server on localhost:3000
+- `pnpm run build` - Build production version and generate sitemap
+- `pnpm start` - Start production server
+- `pnpm run lint` - Run ESLint for code quality checks
 
 ### Testing
 
-- `npm test` - Run Playwright end-to-end tests
-- `npm run test:ui` - Run Playwright tests with UI mode
-- `npm run test:debug` - Run Playwright tests in debug mode
+- `pnpm test` - Run Playwright end-to-end tests
+- `pnpm run test:ui` - Run Playwright tests with UI mode
+- `pnpm run test:debug` - Run Playwright tests in debug mode
 
 ### Additional Commands
 
-- `npm run sitemap` - Generate sitemap using next-sitemap
+- `pnpm run sitemap` - Generate sitemap using next-sitemap
 
 ## Architecture Overview
 
@@ -112,3 +112,7 @@ Tailwind CSS with:
 - Structured data implementation
 - RSS feed generation at `/feed.xml`
 - Optimized for Core Web Vitals with Next.js 15 performance features
+
+### Dev
+
+- Always use `pnpm` for package management

@@ -11,7 +11,7 @@ User-agent: Google-Extended
 Disallow: /
 
 # Host
-Host: https://your-domain.com
+Host: https://talljack.me
 
 # Sitemaps
-Sitemap: https://your-domain.com/sitemap.xml
+Sitemap: https://talljack.me/sitemap.xml
