@@ -3,6 +3,9 @@
 @import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-lite-webfont@1.1.0/style.css');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap');
 
+/* 打印样式 */
+@import '../styles/print.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

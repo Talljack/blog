@@ -247,18 +247,7 @@ export async function GET(request: NextRequest) {
       {
         width: 1200,
         height: 630,
-        fonts: [
-          {
-            name: 'Inter',
-            data: await fetch(
-              new URL(
-                'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
-              )
-            ).then(res => res.arrayBuffer()),
-            style: 'normal',
-            weight: 400,
-          },
-        ],
+        // Remove custom fonts to avoid loading issues, use system fonts instead
       }
     )
   } catch (error) {

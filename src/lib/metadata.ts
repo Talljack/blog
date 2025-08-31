@@ -155,18 +155,7 @@ export function generateMetadata(options: MetadataOptions): Metadata {
       url: false,
     },
 
-    // 视口
-    viewport: {
-      width: 'device-width',
-      initialScale: 1,
-      maximumScale: 5,
-    },
-
-    // 主题颜色
-    themeColor: [
-      { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-      { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
-    ],
+    // 注意: viewport 和 themeColor 现在通过单独的 viewport export 处理
 
     // 图标
     icons: {

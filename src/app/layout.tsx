@@ -1,13 +1,16 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Footer from '@/components/Footer'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import Header from '@/components/Header'
+import ReadingProgress from '@/components/ReadingProgress'
+import ScrollToTop from '@/components/ScrollToTop'
 import SEOOptimizer from '@/components/SEOOptimizer'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { siteConfig } from '@/lib/config'
 import { getDefaultMetadata } from '@/lib/metadata'
+import { viewport as defaultViewport } from '@/lib/viewport'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -84,6 +87,9 @@ export const metadata: Metadata = {
   },
 }
 
+// 导出viewport配置 (Next.js 15+)
+export const viewport: Viewport = defaultViewport
+
 export default function RootLayout({
   children,
 }: {
@@ -146,6 +152,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <ReadingProgress color='#3b82f6' height={3} />
           <div className='relative min-h-screen flex flex-col'>
             <Header />
             <main
@@ -157,6 +164,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            <ScrollToTop threshold={300} />
           </div>
         </ThemeProvider>
       </body>

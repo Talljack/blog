@@ -1,0 +1,267 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+    - link "跳转到主内容" [ref=e2] [cursor=pointer]:
+        - /url: '#main-content'
+    - generic [ref=e3]:
+        - banner [ref=e4]:
+            - generic [ref=e6]:
+                - generic [ref=e7]:
+                    - generic [ref=e8]: 🐥
+                    - navigation [ref=e9]:
+                        - list [ref=e10]:
+                            - listitem [ref=e11]:
+                                - link "博客" [ref=e12] [cursor=pointer]:
+                                    - /url: /blog
+                            - listitem [ref=e13]:
+                                - link "课程" [ref=e14] [cursor=pointer]:
+                                    - /url: /course
+                            - listitem [ref=e15]:
+                                - link "模板🔥" [ref=e16] [cursor=pointer]:
+                                    - /url: /template
+                            - listitem [ref=e17]:
+                                - link "关于" [ref=e18] [cursor=pointer]:
+                                    - /url: /about
+                - generic [ref=e19]:
+                    - generic [ref=e22]:
+                        - img [ref=e23]
+                        - textbox "搜索博客、课程、模板..." [ref=e26]
+                    - generic [ref=e27]:
+                        - link "GitHub" [ref=e28] [cursor=pointer]:
+                            - /url: '#'
+                            - img [ref=e29] [cursor=pointer]
+                        - button "切换主题" [ref=e31] [cursor=pointer]:
+                            - img [ref=e32] [cursor=pointer]
+        - main "主要内容" [ref=e34]:
+            - generic [ref=e35]:
+                - link "返回博客" [ref=e37] [cursor=pointer]:
+                    - /url: /blog
+                    - img [ref=e38] [cursor=pointer]
+                    - text: 返回博客
+                - generic [ref=e41]:
+                    - heading "Playwright 端到端测试完全指南" [level=1] [ref=e42]
+                    - paragraph [ref=e43]: 深入了解如何使用 Playwright 进行现代 Web 应用的端到端测试，包括最佳实践和高级用法。
+                    - generic [ref=e44]:
+                        - generic [ref=e45]:
+                            - img [ref=e46]
+                            - time [ref=e51]: 2024年01月04日
+                        - generic [ref=e52]:
+                            - img [ref=e53]
+                            - generic [ref=e56]: 6 分钟阅读
+                        - generic [ref=e57]:
+                            - img [ref=e58]
+                            - generic [ref=e61]: Talljack
+                        - generic [ref=e63]: 约 1200 字
+                        - generic [ref=e64]: ·
+                        - generic [ref=e65]:
+                            - img [ref=e66]
+                            - generic [ref=e69]: 43 次阅读
+                    - generic [ref=e70]:
+                        - img [ref=e71]
+                        - generic [ref=e74]: Playwright
+                        - generic [ref=e75]: 测试
+                        - generic [ref=e76]: E2E
+                        - generic [ref=e77]: Web开发
+                        - generic [ref=e78]: 自动化
+                - article [ref=e80]:
+                    - generic [ref=e81]:
+                        - heading "Playwright 端到端测试完全指南" [level=1] [ref=e82]
+                        - paragraph [ref=e83]: Playwright 是微软开源的现代端到端测试框架，支持多浏览器、多平台的自动化测试。在这篇文章中，我将全面介绍 Playwright 的使用方法和最佳实践。
+                        - heading "什么是 Playwright？" [level=2] [ref=e84]
+                        - paragraph [ref=e85]: Playwright 是一个用于 Web 应用自动化测试的开源框架，由微软开发。它支持：
+                        - list [ref=e86]:
+                            - listitem [ref=e87]:
+                                - strong [ref=e88]: 多浏览器
+                                - text: ': Chromium、Firefox、WebKit (Safari)'
+                            - listitem [ref=e89]:
+                                - strong [ref=e90]: 跨平台
+                                - text: ': Windows、Linux、macOS'
+                            - listitem [ref=e91]:
+                                - strong [ref=e92]: 多语言
+                                - text: ': JavaScript/TypeScript、Python、Java、C#'
+                            - listitem [ref=e93]:
+                                - strong [ref=e94]: 现代特性
+                                - text: ': 自动等待、拦截网络请求、移动设备模拟'
+                        - heading "为什么选择 Playwright？" [level=2] [ref=e95]
+                        - heading "与其他测试工具对比" [level=3] [ref=e96]
+                        - table [ref=e97]:
+                            - rowgroup [ref=e98]:
+                                - row "特性 Playwright Selenium Cypress" [ref=e99]:
+                                    - cell "特性" [ref=e100]
+                                    - cell "Playwright" [ref=e101]
+                                    - cell "Selenium" [ref=e102]
+                                    - cell "Cypress" [ref=e103]
+                            - rowgroup [ref=e104]:
+                                - row "多浏览器支持 ✅ 原生支持 ✅ 需要驱动 ❌ 主要 Chrome" [ref=e105]:
+                                    - cell "多浏览器支持" [ref=e106]
+                                    - cell "✅ 原生支持" [ref=e107]
+                                    - cell "✅ 需要驱动" [ref=e108]
+                                    - cell "❌ 主要 Chrome" [ref=e109]
+                                - row "速度 🚀 极快 🐌 较慢 ⚡ 快" [ref=e110]:
+                                    - cell "速度" [ref=e111]
+                                    - cell "🚀 极快" [ref=e112]
+                                    - cell "🐌 较慢" [ref=e113]
+                                    - cell "⚡ 快" [ref=e114]
+                                - row "API 一致性 ✅ 统一 API ❌ 各浏览器不同 ✅ 统一" [ref=e115]:
+                                    - cell "API 一致性" [ref=e116]
+                                    - cell "✅ 统一 API" [ref=e117]
+                                    - cell "❌ 各浏览器不同" [ref=e118]
+                                    - cell "✅ 统一" [ref=e119]
+                                - row "网络拦截 ✅ 内置 ❌ 需要额外工具 ✅ 内置" [ref=e120]:
+                                    - cell "网络拦截" [ref=e121]
+                                    - cell "✅ 内置" [ref=e122]
+                                    - cell "❌ 需要额外工具" [ref=e123]
+                                    - cell "✅ 内置" [ref=e124]
+                                - row "移动测试 ✅ 支持 ❌ 复杂 ❌ 不支持" [ref=e125]:
+                                    - cell "移动测试" [ref=e126]
+                                    - cell "✅ 支持" [ref=e127]
+                                    - cell "❌ 复杂" [ref=e128]
+                                    - cell "❌ 不支持" [ref=e129]
+                        - heading "核心优势" [level=3] [ref=e130]
+                        - list [ref=e131]:
+                            - listitem [ref=e132]:
+                                - strong [ref=e133]: 快速可靠
+                                - text: '- 自动等待机制减少不稳定的测试'
+                            - listitem [ref=e134]:
+                                - strong [ref=e135]: 强大的选择器
+                                - text: '- 支持文本、CSS、XPath 等多种选择器'
+                            - listitem [ref=e136]:
+                                - strong [ref=e137]: 并行执行
+                                - text: '- 默认并行运行测试用例'
+                            - listitem [ref=e138]:
+                                - strong [ref=e139]: 丰富的断言
+                                - text: '- 内置多种断言方法'
+                            - listitem [ref=e140]:
+                                - strong [ref=e141]: 调试友好
+                                - text: '- 提供 UI 模式和跟踪功能'
+                        - heading "快速开始" [level=2] [ref=e142]
+                        - heading "安装 Playwright" [level=3] [ref=e143]
+                        - code [ref=e145]: '# 创建新项目 npm init playwright@latest # 或在已有项目中安装 npm install -D @playwright/test # 安装浏览器 npx playwright install'
+                        - heading "基本配置" [level=3] [ref=e146]
+                        - code [ref=e148]: "// playwright.config.ts import { defineConfig, devices } from '@playwright/test' export default defineConfig({ testDir: './tests', fullyParallel: true, forbidOnly: !!process.env.CI, retries: process.env.CI ? 2 : 0, workers: process.env.CI ? 1 : undefined, reporter: 'html', use: { baseURL: 'http://localhost:3000', trace: 'on-first-retry', screenshot: 'only-on-failure', }, projects: [ { name: 'chromium', use: { ...devices['Desktop Chrome'] }, }, { name: 'firefox', use: { ...devices['Desktop Firefox'] }, }, { name: 'webkit', use: { ...devices['Desktop Safari'] }, }, // 移动端测试 { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] }, }, ], webServer: { command: 'npm run dev', url: 'http://localhost:3000', reuseExistingServer: !process.env.CI, }, })"
+                        - heading "基础测试编写" [level=2] [ref=e149]
+                        - heading "第一个测试" [level=3] [ref=e150]
+                        - code [ref=e152]: "// tests/example.spec.ts import { test, expect } from '@playwright/test' test('博客首页加载正常', async ({ page }) => { await page.goto('/') // 检查页面标题 await expect(page).toHaveTitle(/我的博客/) // 检查主标题存在 await expect(page.locator('h1')).toContainText('欢迎来到') // 检查导航链接 await expect(page.locator('nav a[href=\"/blog\"]')).toBeVisible() }) test('博客列表页功能', async ({ page }) => { await page.goto('/blog') // 检查页面标题 await expect(page.locator('h1')).toContainText('博客') // 检查文章卡片存在 const articleCards = page.locator('article') await expect(articleCards).toHaveCountGreaterThan(0) // 点击第一篇文章 await articleCards.first().locator('a').first().click() // 验证跳转到文章详情页 await expect(page.url()).toMatch(/\\/blog\\/[^\\/]+$/) })"
+                        - heading "高级选择器" [level=3] [ref=e153]
+                        - code [ref=e155]: 'test(''选择器示例'', async ({ page }) => { await page.goto(''/blog'') // CSS 选择器 await page.locator(''.blog-card'').first().click() // 文本选择器 await page.locator(''text=阅读更多'').click() // 角色选择器 await page.locator(''role=button[name="搜索"]'').click() // 组合选择器 await page.locator(''article:has-text("Playwright")'').click() // XPath 选择器 await page.locator(''//button[contains(text(), "提交")]'').click() })'
+                        - heading "实际应用场景" [level=2] [ref=e156]
+                        - heading "表单测试" [level=3] [ref=e157]
+                        - code [ref=e159]: 'test(''评论表单提交'', async ({ page }) => { await page.goto(''/blog/hello-world'') // 滚动到评论区 await page.locator(''#comments'').scrollIntoViewIfNeeded() // 填写表单 await page.fill(''[name="name"]'', ''测试用户'') await page.fill(''[name="email"]'', ''test@example.com'') await page.fill(''[name="comment"]'', ''这是一条测试评论'') // 提交表单 await page.click(''button[type="submit"]'') // 验证提交成功 await expect(page.locator(''.success-message'')).toBeVisible() await expect(page.locator(''.comment'')).toContainText(''测试用户'') })'
+                        - heading "网络请求拦截" [level=3] [ref=e160]
+                        - code [ref=e162]: "test('API 请求拦截', async ({ page }) => { // 拦截 API 请求 await page.route('/api/posts', async route => { const response = await route.fetch() const json = await response.json() // 修改响应数据 json.posts.push({ id: 999, title: '测试文章', content: '这是测试内容', }) await route.fulfill({ response, json, }) }) await page.goto('/blog') // 验证修改后的数据 await expect(page.locator('text=测试文章')).toBeVisible() })"
+                        - heading "文件上传测试" [level=3] [ref=e163]
+                        - code [ref=e165]: "test('头像上传功能', async ({ page }) => { await page.goto('/profile') // 选择文件 const fileChooserPromise = page.waitForEvent('filechooser') await page.locator('input[type=\"file\"]').click() const fileChooser = await fileChooserPromise await fileChooser.setFiles('./tests/fixtures/avatar.png') // 验证上传成功 await expect(page.locator('.avatar img')).toHaveAttribute( 'src', /avatar\\.png$/ ) })"
+                        - heading "进阶技巧" [level=2] [ref=e166]
+                        - heading "页面对象模式 (POM)" [level=3] [ref=e167]
+                        - code [ref=e169]: '// pages/BlogPage.ts export class BlogPage { constructor(private page: Page) {} async goto() { await this.page.goto(''/blog'') } async searchPosts(query: string) { await this.page.fill(''[placeholder="搜索文章..."]'', query) await this.page.press(''[placeholder="搜索文章..."]'', ''Enter'') } async clickFirstPost() { await this.page.locator(''article'').first().locator(''a'').first().click() } async getPostTitles() { return await this.page.locator(''article h2'').allTextContents() } } // 使用 POM test(''使用页面对象'', async ({ page }) => { const blogPage = new BlogPage(page) await blogPage.goto() await blogPage.searchPosts(''Playwright'') const titles = await blogPage.getPostTitles() expect(titles).toContain(''Playwright 端到端测试完全指南'') })'
+                        - heading "数据驱动测试" [level=3] [ref=e170]
+                        - code [ref=e172]: '// 测试数据 const searchQueries = [ { query: ''TypeScript'', expectedCount: 1 }, { query: ''Next.js'', expectedCount: 2 }, { query: ''React'', expectedCount: 3 }, ] searchQueries.forEach(({ query, expectedCount }) => { test(`搜索 "${query}" 应该返回 ${expectedCount} 个结果`, async ({ page }) => { await page.goto(''/blog'') await page.fill(''[placeholder="搜索文章..."]'', query) await page.press(''[placeholder="搜索文章..."]'', ''Enter'') const results = page.locator(''article'') await expect(results).toHaveCount(expectedCount) }) })'
+                        - heading "视觉回归测试" [level=3] [ref=e173]
+                        - code [ref=e175]: "test('页面视觉一致性', async ({ page }) => { await page.goto('/blog') // 全页面截图对比 await expect(page).toHaveScreenshot('blog-page.png') // 组件级截图对比 await expect(page.locator('.header')).toHaveScreenshot('header.png') })"
+                        - heading "最佳实践" [level=2] [ref=e176]
+                        - heading "1. 测试组织" [level=3] [ref=e177]
+                        - code [ref=e179]: "test.describe('博客功能测试', () => { test.beforeEach(async ({ page }) => { // 每个测试前的准备工作 await page.goto('/') }) test.describe('文章管理', () => { test('创建文章', async ({ page }) => { // 测试逻辑 }) test('编辑文章', async ({ page }) => { // 测试逻辑 }) test('删除文章', async ({ page }) => { // 测试逻辑 }) }) })"
+                        - heading "2. 等待策略" [level=3] [ref=e180]
+                        - code [ref=e182]: "test('正确的等待方式', async ({ page }) => { await page.goto('/blog') // ✅ 正确：等待元素出现 await expect(page.locator('.loading')).toBeHidden() await expect(page.locator('article')).toBeVisible() // ❌ 错误：硬编码等待时间 // await page.waitForTimeout(3000) // ✅ 正确：等待网络请求完成 await page.waitForResponse( response => response.url().includes('/api/posts') && response.status() === 200 ) })"
+                        - heading "3. 错误处理" [level=3] [ref=e183]
+                        - code [ref=e185]: "test('错误场景处理', async ({ page }) => { // 监听控制台错误 page.on('console', msg => { if (msg.type() === 'error') { console.log('页面错误:', msg.text()) } }) // 监听网络失败 page.on('requestfailed', request => { console.log('网络请求失败:', request.url()) }) await page.goto('/blog') })"
+                        - heading "CI/CD 集成" [level=2] [ref=e186]
+                        - heading "GitHub Actions" [level=3] [ref=e187]
+                        - code [ref=e189]: '# .github/workflows/playwright.yml name: Playwright Tests on: push: branches: [main, master] pull_request: branches: [main, master] jobs: test: timeout-minutes: 60 runs-on: ubuntu-latest steps: - uses: actions/checkout@v3 - uses: actions/setup-node@v3 with: node-version: 18 - name: Install dependencies run: npm ci - name: Install Playwright Browsers run: npx playwright install --with-deps - name: Run Playwright tests run: npx playwright test - uses: actions/upload-artifact@v3 if: always() with: name: playwright-report path: playwright-report/ retention-days: 30'
+                        - heading "调试技巧" [level=2] [ref=e190]
+                        - heading "1. UI 模式" [level=3] [ref=e191]
+                        - code [ref=e193]: '# 以 UI 模式运行测试 npx playwright test --ui'
+                        - heading "2. 调试模式" [level=3] [ref=e194]
+                        - code [ref=e196]: '# 调试特定测试 npx playwright test --debug example.spec.ts'
+                        - heading "3. 录制测试" [level=3] [ref=e197]
+                        - code [ref=e199]: '# 录制新测试 npx playwright codegen localhost:3000'
+                        - heading "性能监控" [level=2] [ref=e200]
+                        - code [ref=e202]: "test('页面性能检查', async ({ page }) => { await page.goto('/blog') // 获取性能指标 const performanceEntries = await page.evaluate(() => { return JSON.stringify(performance.getEntriesByType('navigation')) }) const navigation = JSON.parse(performanceEntries)[0] // 断言性能指标 expect(navigation.loadEventEnd - navigation.loadEventStart).toBeLessThan(2000) expect( navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart ).toBeLessThan(1000) })"
+                        - heading "总结" [level=2] [ref=e203]
+                        - paragraph [ref=e204]: Playwright 是一个功能强大、现代化的端到端测试框架，具有以下优势：
+                        - heading "🎯 核心价值" [level=3] [ref=e205]
+                        - list [ref=e206]:
+                            - listitem [ref=e207]:
+                                - strong [ref=e208]: 可靠性高
+                                - text: '- 自动等待机制减少不稳定测试'
+                            - listitem [ref=e209]:
+                                - strong [ref=e210]: 覆盖面广
+                                - text: '- 支持多浏览器和移动端测试'
+                            - listitem [ref=e211]:
+                                - strong [ref=e212]: 开发体验好
+                                - text: '- 丰富的调试工具和文档'
+                            - listitem [ref=e213]:
+                                - strong [ref=e214]: 维护成本低
+                                - text: '- 统一的 API 和良好的生态'
+                        - heading "🚀 使用建议" [level=3] [ref=e215]
+                        - list [ref=e216]:
+                            - listitem [ref=e217]:
+                                - strong [ref=e218]: 从简单开始
+                                - text: '- 先写基础的页面加载测试'
+                            - listitem [ref=e219]:
+                                - strong [ref=e220]: 逐步完善
+                                - text: '- 添加交互、表单、网络等测试'
+                            - listitem [ref=e221]:
+                                - strong [ref=e222]: 重视维护
+                                - text: '- 使用 POM 模式组织代码'
+                            - listitem [ref=e223]:
+                                - strong [ref=e224]: 持续优化
+                                - text: '- 监控测试稳定性和执行时间'
+                        - heading "📈 未来发展" [level=3] [ref=e225]
+                        - list [ref=e226]:
+                            - listitem [ref=e227]: 更好的组件测试支持
+                            - listitem [ref=e228]: AI 辅助的测试生成
+                            - listitem [ref=e229]: 更丰富的性能分析功能
+                            - listitem [ref=e230]: 与开发工具的深度集成
+                        - paragraph [ref=e231]: Playwright 让端到端测试变得更加简单和可靠，是现代 Web 开发不可或缺的工具。开始使用 Playwright，让你的应用质量更上一层楼！
+                        - heading "资源链接" [level=2] [ref=e232]
+                        - list [ref=e233]:
+                            - listitem [ref=e234]:
+                                - link "Playwright 官方文档" [ref=e235] [cursor=pointer]:
+                                    - /url: https://playwright.dev
+                            - listitem [ref=e236]:
+                                - link "GitHub 仓库" [ref=e237] [cursor=pointer]:
+                                    - /url: https://github.com/microsoft/playwright
+                            - listitem [ref=e238]:
+                                - link "示例项目" [ref=e239] [cursor=pointer]:
+                                    - /url: https://github.com/playwright-community/playwright-examples
+                            - listitem [ref=e240]:
+                                - link "最佳实践指南" [ref=e241] [cursor=pointer]:
+                                    - /url: https://playwright.dev/docs/best-practices
+                        - separator [ref=e242]
+                        - paragraph [ref=e243]:
+                            - emphasis [ref=e244]: 自动化测试是软件质量的保障，Playwright 让这个过程更加高效和愉悦！
+                            - text: 🎭
+                - generic [ref=e246]:
+                    - paragraph [ref=e248]:
+                        - text: 发布于
+                        - time [ref=e249]: 2024年01月04日
+                        - generic [ref=e250]: · 作者：Talljack
+                    - generic [ref=e251]:
+                        - link "更多博客" [ref=e252] [cursor=pointer]:
+                            - /url: /blog
+                            - img [ref=e253] [cursor=pointer]
+                            - text: 更多博客
+                        - generic [ref=e256]: 感谢阅读
+                - generic [ref=e259]:
+                    - heading "评论" [level=3] [ref=e260]
+                    - iframe [ref=e263]:
+
+                    - paragraph [ref=e265]:
+                        - text: 评论由
+                        - link "Giscus" [ref=e266] [cursor=pointer]:
+                            - /url: https://giscus.app/zh-CN
+                        - text: 提供支持
+        - contentinfo [ref=e267]:
+            - generic [ref=e269]:
+                - paragraph [ref=e271]: © 2025 Talljack. 保留所有权利。
+                - paragraph [ref=e273]:
+                    - text: 使用
+                    - generic [ref=e274]: Next.js
+                    - text: 构建，部署在
+                    - generic [ref=e275]: Vercel
+    - button "Open Next.js Dev Tools" [ref=e283] [cursor=pointer]:
+        - img [ref=e284] [cursor=pointer]
+    - alert [ref=e288]
+```

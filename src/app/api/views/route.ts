@@ -251,7 +251,7 @@ export async function POST(request: NextRequest) {
     const response = createSuccessResponse({
       slug,
       views: newViews,
-      storage: isVercelEnvironment() ? 'kv' : 'file',
+      storage: isVercelEnvironment() ? 'redis' : 'file',
     })
 
     return setCorsHeaders(response, request.headers.get('origin'))
