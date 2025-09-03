@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { siteConfig } from '@/lib/config'
 import Search from './Search'
 import ThemeToggle from './ThemeToggle'
+import Logo from './Logo'
 
 export default function Header() {
   const pathname = usePathname()
@@ -18,8 +19,8 @@ export default function Header() {
         {/* 顶部导航栏 - 优化布局 */}
         <div className='flex justify-between items-center mb-6'>
           <div className='flex items-center space-x-6'>
-            {/* 小鸟图标 */}
-            <div className='text-xl'>🐥</div>
+            {/* Logo组件 - 点击回到主页 */}
+            <Logo size={28} />
 
             {/* 导航菜单 */}
             <nav className='hidden sm:block'>

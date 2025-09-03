@@ -52,22 +52,42 @@ export default function BlogCard({
         <ViewCounter slug={post.slug} increment={false} />
       </div>
 
-      {/* 标签 - 可点击 */}
+      {/* 标签 - 可点击，hover显示剩余标签 */}
       {post.tags && post.tags.length > 0 && (
-        <div className='flex flex-wrap gap-1 mt-2'>
+        <div className='flex flex-wrap items-center gap-1 mt-2'>
           {post.tags.slice(0, 2).map(tag => (
             <Link
               key={tag}
               href={`/tag/${encodeURIComponent(tag)}`}
-              className='inline-block text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors'
+              className='inline-flex items-center text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors'
             >
               {tag}
             </Link>
           ))}
           {post.tags.length > 2 && (
-            <span className='text-xs text-gray-500 dark:text-gray-500'>
-              +{post.tags.length - 2}
-            </span>
+            <div className='relative group'>
+              <span className='inline-flex items-center text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer'>
+                +{post.tags.length - 2}
+              </span>
+              {/* 悬浮显示剩余标签 */}
+              <div className='absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto z-10'>
+                <div className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 min-w-max'>
+                  <div className='flex flex-wrap gap-1 justify-center'>
+                    {post.tags.slice(2).map(tag => (
+                      <Link
+                        key={tag}
+                        href={`/tag/${encodeURIComponent(tag)}`}
+                        className='inline-flex items-center text-xs px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors whitespace-nowrap'
+                      >
+                        {tag}
+                      </Link>
+                    ))}
+                  </div>
+                  {/* 小三角箭头 - 居中显示 */}
+                  <div className='absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-200 dark:border-t-gray-700' />
+                </div>
+              </div>
+            </div>
           )}
         </div>
       )}
