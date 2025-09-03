@@ -3,7 +3,7 @@ export const siteConfig = {
   description:
     process.env.NEXT_PUBLIC_SITE_DESCRIPTION || '分享技术心得与生活感悟',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://your-blog-url.com',
-  ogImage: '/og-image.jpg',
+  ogImage: '/og-image.png',
   author: {
     name: process.env.NEXT_PUBLIC_AUTHOR_NAME || '你的名字',
     bio: process.env.NEXT_PUBLIC_AUTHOR_BIO || '全栈开发者，热爱技术与写作',
@@ -47,6 +47,20 @@ export const siteConfig = {
     maxRecentPosts: parseInt(process.env.MAX_RECENT_POSTS || '10'),
     maxPopularPosts: parseInt(process.env.MAX_POPULAR_POSTS || '5'),
     maxTagsDisplay: parseInt(process.env.MAX_TAGS_DISPLAY || '20'),
+  },
+  pwa: {
+    name: process.env.NEXT_PUBLIC_SITE_NAME || '我的博客',
+    shortName: '博客',
+    description:
+      process.env.NEXT_PUBLIC_SITE_DESCRIPTION || '分享技术心得与生活感悟',
+    themeColor: '#3b82f6',
+    backgroundColor: '#ffffff',
+    display: 'standalone',
+    orientation: 'portrait-primary',
+    scope: '/',
+    startUrl: '/',
+    categories: ['productivity', 'technology', 'education', 'lifestyle'],
+    lang: 'zh-CN',
   },
 }
 

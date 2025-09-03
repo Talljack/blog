@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="ogGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <rect width="1200" height="630" fill="url(#ogGrad)"/>
+  
+  <!-- 主标题区域 -->
+  <g transform="translate(600, 315)">
+    <!-- 图标 -->
+    <g transform="translate(-120, -40)">
+      <rect x="-40" y="-40" width="80" height="80" rx="12" fill="#3b82f6" opacity="0.9"/>
+      <g fill="white" opacity="0.95">
+        <path d="M-15,-10 L-25,0 L-15,10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M-5,-12 L5,12" stroke="white" stroke-width="3" stroke-linecap="round"/>
+        <path d="M15,-10 L25,0 L15,10" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g>
+    </g>
+    
+    <!-- 文本 -->
+    <text x="0" y="0" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="48" font-weight="700">我的技术博客</text>
+    <text x="0" y="40" text-anchor="middle" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="24" font-weight="400">分享技术心得与生活感悟</text>
+  </g>
+  
+  <!-- 装饰元素 -->
+  <circle cx="100" cy="100" r="2" fill="white" opacity="0.3"/>
+  <circle cx="1100" cy="530" r="3" fill="white" opacity="0.2"/>
+  <circle cx="150" cy="500" r="1.5" fill="white" opacity="0.4"/>
+</svg>

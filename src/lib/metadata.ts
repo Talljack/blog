@@ -157,15 +157,23 @@ export function generateMetadata(options: MetadataOptions): Metadata {
 
     // 注意: viewport 和 themeColor 现在通过单独的 viewport export 处理
 
-    // 图标
+    // 图标 - 优先使用现代SVG格式
     icons: {
       icon: [
+        { url: '/favicon.svg', type: 'image/svg+xml' },
         { url: '/favicon.ico', sizes: 'any' },
         { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
         { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
       ],
       apple: [
         { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      ],
+      other: [
+        {
+          rel: 'mask-icon',
+          url: '/safari-pinned-tab.svg',
+          color: '#3b82f6',
+        },
       ],
     },
 

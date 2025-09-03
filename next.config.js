@@ -36,7 +36,7 @@ const nextConfig = {
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
 
   // === 输出配置 ===
-  output: 'standalone',
+  // output: 'standalone', // 暂时禁用以修复开发服务器问题
 
   // === 打包分析 (通过环境变量启用) ===
   ...(process.env.ANALYZE === 'true' && {
@@ -97,6 +97,30 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Service Worker缓存策略
+        source: '/sw.js',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=0, must-revalidate',
+          },
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/',
+          },
+        ],
+      },
+      {
+        // Manifest文件缓存
+        source: '/site.webmanifest',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400',
           },
         ],
       },

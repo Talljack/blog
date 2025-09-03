@@ -4,6 +4,9 @@ import './globals.css'
 import Footer from '@/components/Footer'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import Header from '@/components/Header'
+import OfflineIndicator from '@/components/OfflineIndicator'
+import PWAInstallPrompt from '@/components/PWAInstallPrompt'
+import PWAUpdateBanner from '@/components/PWAUpdateBanner'
 import ReadingProgress from '@/components/ReadingProgress'
 import ScrollToTop from '@/components/ScrollToTop'
 import SEOOptimizer from '@/components/SEOOptimizer'
@@ -132,12 +135,14 @@ export default function RootLayout({
         <meta name='color-scheme' content='light dark' />
 
         {/* PWA支持 */}
+        <link rel='manifest' href='/site.webmanifest' />
         <meta name='mobile-web-app-capable' content='yes' />
         <meta name='apple-mobile-web-app-capable' content='yes' />
         <meta
           name='apple-mobile-web-app-status-bar-style'
           content='black-translucent'
         />
+        <meta name='apple-mobile-web-app-title' content={siteConfig.name} />
 
         {/* Microsoft Tiles */}
         <meta name='msapplication-TileColor' content='#3b82f6' />
@@ -152,6 +157,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <PWAUpdateBanner />
           <ReadingProgress color='#3b82f6' height={3} />
           <div className='relative min-h-screen flex flex-col'>
             <Header />
@@ -165,6 +171,8 @@ export default function RootLayout({
             </main>
             <Footer />
             <ScrollToTop threshold={300} />
+            <OfflineIndicator />
+            <PWAInstallPrompt />
           </div>
         </ThemeProvider>
       </body>
