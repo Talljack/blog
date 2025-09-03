@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { X, Download, Smartphone } from 'lucide-react'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -15,28 +15,9 @@ export default function PWAInstallPrompt() {
   const [isInstalled, setIsInstalled] = useState(false)
   const [promptUsed, setPromptUsed] = useState(false) // 跟踪prompt是否已被使用
 
-  useEffect(() => {
-    // 检查是否已经安装
-    const checkIfInstalled = () => {
-      const isStandalone = window.matchMedia(
-        '(display-mode: standalone)'
-      ).matches
-      const isInWebAppChrome =
-        (window.navigator as unknown as { standalone?: boolean }).standalone ===
-        true
-      const installed = isStandalone || isInWebAppChrome
-      console.info('PWA安装状态检查:', {
-        isStandalone,
-        isInWebAppChrome,
-        installed,
-      })
-      setIsInstalled(installed)
-    }
-
-    checkIfInstalled()
-
-    // 监听安装提示事件
-    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
+  // 使用useCallback来稳定事件处理函数
+  const handleBeforeInstallPrompt = useCallback(
+    (e: BeforeInstallPromptEvent) => {
       console.info('✅ 接收到 beforeinstallprompt 事件', e)
       // 阻止自动显示安装提示
       e.preventDefault()
@@ -58,42 +39,62 @@ export default function PWAInstallPrompt() {
       } else {
         console.info('❌ 不显示安装横幅 - 已显示过或已安装')
       }
+    },
+    [isInstalled, promptUsed]
+  )
+
+  const handleAppInstalled = useCallback(() => {
+    console.info('应用已安装')
+    setIsInstalled(true)
+    setShowInstallBanner(false)
+    setDeferredPrompt(null)
+    localStorage.removeItem('pwa-install-dismissed')
+  }, [])
+
+  const handleDisplayModeChange = useCallback((e: MediaQueryListEvent) => {
+    console.info('显示模式改变:', e.matches)
+    setIsInstalled(e.matches)
+  }, [])
+
+  useEffect(() => {
+    // 检查是否已经安装
+    const checkIfInstalled = () => {
+      const isStandalone = window.matchMedia(
+        '(display-mode: standalone)'
+      ).matches
+      const isInWebAppChrome =
+        (window.navigator as unknown as { standalone?: boolean }).standalone ===
+        true
+      const installed = isStandalone || isInWebAppChrome
+      console.info('PWA安装状态检查:', {
+        isStandalone,
+        isInWebAppChrome,
+        installed,
+      })
+      setIsInstalled(installed)
     }
 
-    // 监听应用安装事件
-    const handleAppInstalled = () => {
-      console.info('应用已安装')
-      setIsInstalled(true)
-      setShowInstallBanner(false)
-      setDeferredPrompt(null)
-      localStorage.removeItem('pwa-install-dismissed')
-    }
-
-    // 监听显示模式变化
-    const handleDisplayModeChange = (e: MediaQueryListEvent) => {
-      console.info('显示模式改变:', e.matches)
-      setIsInstalled(e.matches)
-    }
+    checkIfInstalled()
 
     // 开发环境调试：如果没有安装提示事件，延迟显示测试按钮
     const isDev = process.env.NODE_ENV === 'development'
     if (isDev) {
       console.info('开发环境：等待 beforeinstallprompt 事件...')
       const timer = setTimeout(() => {
-        if (!deferredPrompt && !isInstalled) {
-          console.info(
-            '开发环境：5秒后未收到 beforeinstallprompt 事件，显示测试安装提示'
-          )
-          const hasShownPrompt = localStorage.getItem('pwa-install-dismissed')
-          if (!hasShownPrompt) {
-            setShowInstallBanner(true)
-          }
+        console.info(
+          '开发环境：5秒后未收到 beforeinstallprompt 事件，显示测试安装提示'
+        )
+        const hasShownPrompt = localStorage.getItem('pwa-install-dismissed')
+        if (!hasShownPrompt) {
+          setShowInstallBanner(true)
         }
       }, 5000)
 
-      setTimeout(() => clearTimeout(timer), 5000)
+      return () => clearTimeout(timer)
     }
+  }, [])
 
+  useEffect(() => {
     window.addEventListener(
       'beforeinstallprompt',
       handleBeforeInstallPrompt as EventListener
@@ -111,7 +112,7 @@ export default function PWAInstallPrompt() {
       window.removeEventListener('appinstalled', handleAppInstalled)
       mediaQuery.removeListener(handleDisplayModeChange)
     }
-  }, [isInstalled, deferredPrompt, promptUsed])
+  }, [handleBeforeInstallPrompt, handleAppInstalled, handleDisplayModeChange])
 
   const handleInstallClick = async () => {
     console.info('🔥 handleInstallClick 函数被调用!')
