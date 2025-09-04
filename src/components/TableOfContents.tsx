@@ -1,14 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { List, ChevronDown, ChevronRight } from 'lucide-react'
+import { List } from 'lucide-react'
 import type { TableOfContentsItem } from '@/types/blog'
 
 interface TableOfContentsProps {
   content: string
   className?: string
   maxDepth?: number
-  showToggle?: boolean
   position?: 'sticky' | 'fixed' | 'static'
 }
 
@@ -16,13 +15,10 @@ export default function TableOfContents({
   content,
   className = '',
   maxDepth = 4,
-  showToggle = true,
   position = 'sticky',
 }: TableOfContentsProps) {
   const [toc, setToc] = useState<TableOfContentsItem[]>([])
   const [activeId, setActiveId] = useState<string>('')
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isVisible, setIsVisible] = useState(true)
   const observerRef = useRef<IntersectionObserver | null>(null)
 
   // 从HTML内容中提取目录结构
@@ -140,27 +136,28 @@ export default function TableOfContents({
     const hasChildren = item.children && item.children.length > 0
 
     return (
-      <li key={item.id} className={`mb-1 ${depth > 0 ? 'ml-4' : ''}`}>
+      <li key={item.id} className={`${depth > 0 ? `ml-${depth * 3}` : ''}`}>
         <button
           onClick={() => handleTOCClick(item.id)}
           className={`
-            w-full text-left text-sm transition-all duration-200
+            w-full text-left text-xs lg:text-sm transition-all duration-200
             hover:text-blue-600 dark:hover:text-blue-400
             ${
               isActive
-                ? 'text-blue-600 dark:text-blue-400 font-medium border-l-2 border-blue-600 dark:border-blue-400 pl-3 bg-blue-50 dark:bg-blue-900/20'
-                : 'text-gray-600 dark:text-gray-400 pl-3'
+                ? 'text-blue-600 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/30'
+                : 'text-gray-600 dark:text-gray-400'
             }
-            ${depth === 0 ? 'py-2' : 'py-1'}
-            rounded-r-md
+            px-2 py-1 lg:py-1.5 rounded-md block
           `}
           title={item.title}
         >
-          <span className='line-clamp-2'>{item.title}</span>
+          <span className='line-clamp-2 leading-3 lg:leading-4'>
+            {item.title}
+          </span>
         </button>
 
         {hasChildren && (
-          <ul className='mt-1'>
+          <ul className='mt-0.5 space-y-0.5'>
             {item.children?.map(child => renderTOCItem(child, depth + 1))}
           </ul>
         )}
@@ -182,64 +179,25 @@ export default function TableOfContents({
     <nav
       className={`
         ${positionClasses[position]}
-        max-w-xs bg-white dark:bg-gray-800
-        border border-gray-200 dark:border-gray-700
-        rounded-lg shadow-lg p-4
-        max-h-96 overflow-y-auto
-        ${!isVisible ? 'hidden' : ''}
+        w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md
+        border border-gray-200/50 dark:border-gray-700/50
+        rounded-xl shadow-xl p-3 lg:p-4
+        max-h-[min(60vh,400px)] lg:max-h-[calc(100vh-200px)] overflow-y-auto
+        text-sm lg:text-base
         ${className}
       `}
       aria-label='目录导航'
     >
       {/* 头部 */}
-      <div className='flex items-center justify-between mb-3 pb-2 border-b border-gray-200 dark:border-gray-700'>
-        <div className='flex items-center gap-2'>
-          <List className='w-4 h-4 text-gray-500' />
-          <h3 className='font-medium text-gray-900 dark:text-gray-100 text-sm'>
-            目录
-          </h3>
-        </div>
-
-        {showToggle && (
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className='p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors'
-            aria-label={isCollapsed ? '展开目录' : '收起目录'}
-          >
-            {isCollapsed ? (
-              <ChevronRight className='w-4 h-4 text-gray-500' />
-            ) : (
-              <ChevronDown className='w-4 h-4 text-gray-500' />
-            )}
-          </button>
-        )}
+      <div className='flex items-center gap-2 mb-4'>
+        <List className='w-4 h-4 text-blue-500' />
+        <h3 className='font-semibold text-gray-900 dark:text-gray-100 text-sm'>
+          目录
+        </h3>
       </div>
 
       {/* 目录内容 */}
-      {!isCollapsed && (
-        <ul className='space-y-1'>{toc.map(item => renderTOCItem(item))}</ul>
-      )}
-
-      {/* 进度指示器 */}
-      {!isCollapsed && (
-        <div className='mt-3 pt-2 border-t border-gray-200 dark:border-gray-700'>
-          <div className='text-xs text-gray-500 mb-1'>阅读进度</div>
-          <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1'>
-            <div
-              className='bg-blue-600 h-1 rounded-full transition-all duration-300'
-              style={{
-                width: `${Math.min(
-                  (document.documentElement.scrollTop /
-                    (document.documentElement.scrollHeight -
-                      window.innerHeight)) *
-                    100,
-                  100
-                )}%`,
-              }}
-            />
-          </div>
-        </div>
-      )}
+      <ul className='space-y-0.5'>{toc.map(item => renderTOCItem(item))}</ul>
     </nav>
   )
 }
@@ -299,34 +257,35 @@ export function MobileTableOfContents({
 
       {/* 全屏抽屉 */}
       {isOpen && (
-        <div className='md:hidden fixed inset-0 z-50 bg-white dark:bg-gray-900'>
-          <div className='flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700'>
-            <h2 className='text-lg font-medium'>目录</h2>
+        <div className='md:hidden fixed inset-0 z-50 bg-white dark:bg-gray-900 mobile-toc-drawer'>
+          <div className='flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700'>
+            <h2 className='text-base font-semibold'>目录</h2>
             <button
               onClick={() => setIsOpen(false)}
-              className='text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+              className='w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-800 transition-colors'
+              aria-label='关闭目录'
             >
               ✕
             </button>
           </div>
 
-          <div className='p-4 overflow-y-auto'>
-            <ul className='space-y-3'>
+          <div className='p-3 overflow-y-auto max-h-[calc(100vh-80px)] mobile-toc-content'>
+            <ul className='space-y-1'>
               {toc.map(item => (
                 <li key={item.id}>
                   <button
                     onClick={() => handleItemClick(item.id)}
                     className={`
-                      w-full text-left p-3 rounded-lg transition-colors
+                      w-full text-left p-2 rounded-md transition-colors text-sm
                       ${
                         activeId === item.id
-                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                       }
                     `}
-                    style={{ marginLeft: `${(item.level - 1) * 16}px` }}
+                    style={{ marginLeft: `${(item.level - 1) * 12}px` }}
                   >
-                    {item.title}
+                    <span className='line-clamp-2 leading-5'>{item.title}</span>
                   </button>
                 </li>
               ))}

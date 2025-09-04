@@ -3,7 +3,13 @@ import path from 'path'
 import matter from 'gray-matter'
 import { remark } from 'remark'
 import remarkGfm from 'remark-gfm'
-import html from 'remark-html'
+import remarkToc from 'remark-toc'
+import remarkRehype from 'remark-rehype'
+import rehypeSlug from 'rehype-slug'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import rehypeStringify from 'rehype-stringify'
+import { JSDOM } from 'jsdom'
+import type { TableOfContentsItem } from '@/types/blog'
 
 const postsDirectory = path.join(process.cwd(), 'src/content/blog')
 
@@ -18,6 +24,7 @@ export interface BlogPost {
   author?: string
   featured?: boolean
   lastModified?: string
+  tableOfContents?: TableOfContentsItem[]
 }
 
 export interface BlogPostMeta {
@@ -42,6 +49,58 @@ function calculateReadTime(content: string): number {
   const wordsPerMinute = 200
   const words = content.split(/\s+/).length
   return Math.ceil(words / wordsPerMinute)
+}
+
+function extractTableOfContents(
+  htmlContent: string,
+  maxDepth = 4
+): TableOfContentsItem[] {
+  const dom = new JSDOM(htmlContent)
+  const document = dom.window.document
+  const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6')
+
+  const tocItems: TableOfContentsItem[] = []
+  const stack: { item: TableOfContentsItem; level: number }[] = []
+
+  headings.forEach((heading, index) => {
+    const level = parseInt(heading.tagName.charAt(1))
+    if (level > maxDepth) return
+
+    let id = heading.id
+    if (!id) {
+      id =
+        heading.textContent
+          ?.toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w\u4e00-\u9fff-]/g, '') || `heading-${index}`
+      heading.id = id
+    }
+
+    const title = heading.textContent || ''
+
+    const tocItem: TableOfContentsItem = {
+      id,
+      title,
+      level,
+      children: [],
+    }
+
+    while (stack.length > 0 && stack[stack.length - 1].level >= level) {
+      stack.pop()
+    }
+
+    if (stack.length === 0) {
+      tocItems.push(tocItem)
+    } else {
+      const parent = stack[stack.length - 1].item
+      parent.children = parent.children || []
+      parent.children.push(tocItem)
+    }
+
+    stack.push({ item: tocItem, level })
+  })
+
+  return tocItems
 }
 
 export async function getAllPosts(): Promise<BlogPostMeta[]> {
@@ -95,10 +154,20 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
 
     const processedContent = await remark()
       .use(remarkGfm)
-      .use(html, { sanitize: false })
+      .use(remarkToc, { heading: '目录', tight: true })
+      .use(remarkRehype)
+      .use(rehypeSlug)
+      .use(rehypeAutolinkHeadings, {
+        behavior: 'wrap',
+        properties: {
+          className: ['anchor-link'],
+        },
+      })
+      .use(rehypeStringify)
       .process(content)
 
     const contentHtml = processedContent.toString()
+    const tableOfContents = extractTableOfContents(contentHtml)
 
     return {
       slug,
@@ -110,6 +179,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       tags: data.tags || [],
       author: data.author,
       featured: data.featured || false,
+      tableOfContents,
     }
   } catch (error) {
     console.error(`Error reading post ${slug}:`, error)
