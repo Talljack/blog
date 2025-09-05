@@ -8,6 +8,7 @@ import OfflineIndicator from '@/components/OfflineIndicator'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import PWAUpdateBanner from '@/components/PWAUpdateBanner'
 import ReadingProgress from '@/components/ReadingProgress'
+import ResourcePreloader from '@/components/ResourcePreloader'
 import ScrollToTop from '@/components/ScrollToTop'
 import SEOOptimizer from '@/components/SEOOptimizer'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -153,6 +154,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <GoogleAnalytics />
         <SEOOptimizer />
+        <ResourcePreloader />
         <ThemeProvider
           attribute='class'
           defaultTheme='system'

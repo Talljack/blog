@@ -232,6 +232,31 @@ body {
   padding: 0;
 }
 
+/* 搜索高亮样式 */
+.search-highlight {
+  background: linear-gradient(120deg, #fbbf24 0%, #f59e0b 100%);
+  color: #92400e;
+  padding: 0.1em 0.2em;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.3);
+}
+
+.dark .search-highlight {
+  background: linear-gradient(120deg, #fbbf24 0%, #f59e0b 100%);
+  color: #451a03;
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.5);
+}
+
+/* Giscus 主题适配 */
+.giscus-container {
+  color-scheme: light dark;
+}
+
+.dark .giscus-container {
+  color-scheme: dark;
+}
+
 /* 自定义滚动条 */
 ::-webkit-scrollbar {
   width: 6px;

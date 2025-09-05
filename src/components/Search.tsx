@@ -28,9 +28,6 @@ export default function Search({
 }: SearchProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
-  const [posts, setPosts] = useState<SearchResult[]>([])
-  const [courses, setCourses] = useState<SearchResult[]>([])
-  const [templates, setTemplates] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [debouncedQuery] = useDebounce(query, 300)
@@ -43,9 +40,6 @@ export default function Search({
     const performSearch = async () => {
       if (debouncedQuery.trim().length < 2) {
         setResults([])
-        setPosts([])
-        setCourses([])
-        setTemplates([])
         setIsOpen(false)
         return
       }
@@ -53,20 +47,19 @@ export default function Search({
       setIsLoading(true)
       try {
         const response = await fetch(
-          `/api/search?q=${encodeURIComponent(debouncedQuery)}`
+          `/api/search?q=${encodeURIComponent(debouncedQuery)}&type=all`
         )
         const data = await response.json()
-        setResults(data.results || [])
-        setPosts(data.posts || [])
-        setCourses(data.courses || [])
-        setTemplates(data.templates || [])
+
+        if (data.results) {
+          setResults(data.results)
+        } else {
+          setResults([])
+        }
         setIsOpen(true)
       } catch (error) {
         console.error('Search failed:', error)
         setResults([])
-        setPosts([])
-        setCourses([])
-        setTemplates([])
       } finally {
         setIsLoading(false)
       }
@@ -106,9 +99,6 @@ export default function Search({
   const clearSearch = () => {
     setQuery('')
     setResults([])
-    setPosts([])
-    setCourses([])
-    setTemplates([])
     setIsOpen(false)
     inputRef.current?.focus()
   }
@@ -139,154 +129,66 @@ export default function Search({
 
       {/* 搜索结果 */}
       {isOpen && (
-        <div className='absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[100] max-h-96 overflow-y-auto'>
+        <div className='absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-[100] max-h-80 overflow-hidden min-w-[500px]'>
           {isLoading ? (
-            <div className='p-4 text-center text-gray-500 dark:text-gray-400'>
-              搜索中...
+            <div className='p-4 text-center'>
+              <div className='flex items-center justify-center space-x-2 text-gray-500 dark:text-gray-400'>
+                <div className='w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin' />
+                <span className='text-sm'>搜索中...</span>
+              </div>
             </div>
           ) : results.length > 0 ? (
-            <>
-              <div className='p-2 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700'>
-                找到 {results.length} 个结果
-              </div>
+            <div className='overflow-y-auto max-h-80'>
+              {results
+                .filter(result => (result as any).type !== 'tag') // 过滤掉标签类型
+                .map((result, index) => {
+                  // 确定结果类型和链接
+                  const isPost = result.type === 'post'
+                  const isCourse = result.type === 'course'
+                  const isTemplate = result.type === 'template'
 
-              {/* 课程结果 */}
-              {courses.length > 0 && (
-                <>
-                  <div className='p-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/30'>
-                    课程 ({courses.length})
-                  </div>
-                  {courses.map(course => (
+                  const href = isPost
+                    ? `/blog/${result.slug}`
+                    : isCourse
+                      ? `/course/${result.slug}`
+                      : `/template/${result.slug}`
+
+                  const icon = isPost ? '📝' : isCourse ? '📚' : '🚀'
+                  const typeLabel = isPost ? '文章' : isCourse ? '课程' : '模板'
+
+                  return (
                     <Link
-                      key={`course-${course.slug}`}
-                      href={`/course/${course.slug}`}
+                      key={`${result.type}-${result.slug || result.title}-${index}`}
+                      href={href}
                       onClick={() => setIsOpen(false)}
-                      className='block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 transition-colors'
+                      className='flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors'
                     >
-                      <div className='flex items-start justify-between'>
-                        <div className='flex-1'>
-                          <h3 className='font-medium text-gray-900 dark:text-gray-100 mb-1 line-clamp-1'>
-                            {course.title}
+                      <span className='mr-3 text-lg flex-shrink-0'>{icon}</span>
+                      <div className='flex-1 min-w-0'>
+                        <div className='flex items-start space-x-2'>
+                          <h3 className='font-medium text-gray-900 dark:text-gray-100 flex-1 leading-relaxed'>
+                            {result.title}
                           </h3>
-                          <p className='text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2'>
-                            {course.description || ''}
-                          </p>
-                          <div className='flex items-center space-x-3 text-xs text-gray-500 dark:text-gray-500'>
-                            <span>课程</span>
-                            {course.tags &&
-                              course.tags.length > 0 &&
-                              course.tags.slice(0, 2).map(tag => (
-                                <span
-                                  key={tag}
-                                  className='px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded text-xs'
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                          </div>
+                          <span className='px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded flex-shrink-0 mt-0.5'>
+                            {typeLabel}
+                          </span>
                         </div>
-                        <div className='ml-3 text-lg'>📚</div>
-                      </div>
-                    </Link>
-                  ))}
-                </>
-              )}
-
-              {/* 模板结果 */}
-              {templates.length > 0 && (
-                <>
-                  <div className='p-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/30'>
-                    模板 ({templates.length})
-                  </div>
-                  {templates.map(template => (
-                    <Link
-                      key={`template-${template.slug}`}
-                      href={`/template/${template.slug}`}
-                      target='_self'
-                      onClick={() => setIsOpen(false)}
-                      className='block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 transition-colors'
-                    >
-                      <div className='flex items-start justify-between'>
-                        <div className='flex-1'>
-                          <h3 className='font-medium text-gray-900 dark:text-gray-100 mb-1 line-clamp-1'>
-                            {template.title}
-                          </h3>
-                          <p className='text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2'>
-                            {template.description || ''}
-                          </p>
-                          <div className='flex items-center space-x-3 text-xs text-gray-500 dark:text-gray-500'>
-                            <span>模板</span>
-                            {template.tags &&
-                              template.tags.length > 0 &&
-                              template.tags.slice(0, 2).map(tag => (
-                                <span
-                                  key={tag}
-                                  className='px-1.5 py-0.5 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded text-xs'
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                          </div>
-                        </div>
-                        <div className='ml-3 text-lg'>🚀</div>
-                      </div>
-                    </Link>
-                  ))}
-                </>
-              )}
-
-              {/* 文章结果 */}
-              {posts.length > 0 && (
-                <>
-                  <div className='p-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/30'>
-                    文章 ({posts.length})
-                  </div>
-                  {posts.map(result => (
-                    <Link
-                      key={`post-${result.slug}`}
-                      href={`/blog/${result.slug}`}
-                      onClick={() => setIsOpen(false)}
-                      className='block p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors'
-                    >
-                      <h3 className='font-medium text-gray-900 dark:text-gray-100 mb-1 line-clamp-1'>
-                        {result.title}
-                      </h3>
-                      {result.description && (
-                        <p className='text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2'>
-                          {result.description}
-                        </p>
-                      )}
-                      <div className='flex items-center space-x-3 text-xs text-gray-500 dark:text-gray-500'>
-                        <span>{formatDateChinese((result as any).date)}</span>
-                        {(result as any).readTime && (
-                          <>
-                            <span>·</span>
-                            <span>{(result as any).readTime} 分钟阅读</span>
-                          </>
-                        )}
-                        {result.tags && result.tags.length > 0 && (
-                          <>
-                            <span>·</span>
-                            <div className='flex items-center space-x-1'>
-                              {result.tags.slice(0, 2).map(tag => (
-                                <span
-                                  key={tag}
-                                  className='px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs'
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          </>
+                        {/* 只有当有匹配内容且不是标题匹配时才显示描述 */}
+                        {result.description && (result as any).matches && (
+                          <p
+                            className='text-sm text-gray-600 dark:text-gray-400 truncate mt-1'
+                            dangerouslySetInnerHTML={{
+                              __html: result.description,
+                            }}
+                          />
                         )}
                       </div>
                     </Link>
-                  ))}
-                </>
-              )}
-            </>
+                  )
+                })}
+            </div>
           ) : query.trim().length >= 2 ? (
-            <div className='p-4 text-center text-gray-500 dark:text-gray-400'>
+            <div className='p-4 text-center text-gray-500 dark:text-gray-400 text-sm'>
               没有找到相关内容
             </div>
           ) : null}
