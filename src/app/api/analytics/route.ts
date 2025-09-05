@@ -12,10 +12,10 @@ import { getAllPosts } from '@/lib/blog'
 const redis = Redis.fromEnv()
 const KV_PREFIX = 'blog:views:'
 
-// 配置速率限制 - 分析API需要更宽松的限制
+// 配置速率限制 - 考虑Vercel KV免费版限制
 const analyticsRateLimit = rateLimit({
-  maxRequests: 50,
-  windowMs: 60000, // 1分钟
+  maxRequests: 10, // 降低请求频率
+  windowMs: 300000, // 5分钟窗口
 })
 
 // 分析数据接口
@@ -244,9 +244,10 @@ export async function HEAD(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // 验证管理员权限
-    if (!hasAdminAccess(request)) {
-      return createErrorResponse('访问被拒绝', 403)
+    // 开发环境下跳过权限检查，生产环境需要管理员权限
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    if (!isDevelopment && !hasAdminAccess(request)) {
+      return createErrorResponse('需要管理员权限访问此资源', 403)
     }
 
     // 验证请求
@@ -287,7 +288,7 @@ export async function GET(request: NextRequest) {
 }
 
 // 支持OPTIONS请求用于CORS
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   const response = new Response(null, { status: 200 })
   return response
 }
