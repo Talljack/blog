@@ -1,4 +1,5 @@
 import BlogCard from '@/components/BlogCard'
+import Newsletter from '@/components/Newsletter'
 import { getAllPosts, getFeaturedPosts } from '@/lib/blog'
 
 export default async function HomePage() {
@@ -27,7 +28,7 @@ export default async function HomePage() {
       )}
 
       {/* 最近文章部分 - 如果有推荐文章，则不显示标题 */}
-      <section>
+      <section className='mb-8'>
         <div className='space-y-0'>
           {recentPosts
             .filter(post => !post.featured) // 排除已在推荐区域显示的文章
@@ -35,6 +36,15 @@ export default async function HomePage() {
               <BlogCard key={post.slug} post={post} showDescription={true} />
             ))}
         </div>
+      </section>
+
+      {/* Newsletter 订阅部分 */}
+      <section>
+        <Newsletter
+          variant='card'
+          title='📧 订阅我的博客'
+          description='第一时间获取最新技术文章和深度思考，不定期发送，绝不骚扰。'
+        />
       </section>
 
       {/* 如果没有文章，显示友好提示 */}

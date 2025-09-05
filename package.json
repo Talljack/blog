@@ -20,13 +20,16 @@
     "demo:views": "node scripts/generate-demo-views.js",
     "analyze": "node scripts/bundle-analyzer.js",
     "analyze:summary": "node scripts/bundle-analyzer.js --summary",
-    "perf:check": "node scripts/performance-check.js"
+    "perf:check": "node scripts/performance-check.js",
+    "newsletter:send": "node scripts/send-newsletter.js",
+    "newsletter:help": "node scripts/send-newsletter.js --help"
   },
   "dependencies": {
     "@upstash/redis": "^1.35.3",
     "autoprefixer": "^10.4.21",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.2",
     "fuse.js": "^7.1.0",
     "gray-matter": "^4.0.3",
     "jsdom": "^26.1.0",

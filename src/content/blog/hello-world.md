@@ -5,6 +5,7 @@ date: '2024-01-01'
 tags: ['博客', '开始', '介绍']
 featured: true
 author: 'Talljack'
+newsletter: true
 ---
 
 # 欢迎来到我的博客！

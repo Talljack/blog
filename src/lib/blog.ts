@@ -23,6 +23,7 @@ export interface BlogPost {
   tags: string[]
   author?: string
   featured?: boolean
+  newsletter?: boolean // 是否发送到邮件订阅
   lastModified?: string
   tableOfContents?: TableOfContentsItem[]
 }
@@ -36,6 +37,7 @@ export interface BlogPostMeta {
   tags: string[]
   author?: string
   featured?: boolean
+  newsletter?: boolean // 是否发送到邮件订阅
   lastModified?: string
 }
 
@@ -125,6 +127,7 @@ export async function getAllPosts(): Promise<BlogPostMeta[]> {
           tags: data.tags || [],
           author: data.author,
           featured: data.featured || false,
+          newsletter: data.newsletter || false,
         } as BlogPostMeta
       })
   )
@@ -179,6 +182,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
       tags: data.tags || [],
       author: data.author,
       featured: data.featured || false,
+      newsletter: data.newsletter || false,
       tableOfContents,
     }
   } catch (error) {
@@ -204,4 +208,9 @@ export async function getAllTags(): Promise<string[]> {
     post.tags.forEach(tag => tags.add(tag))
   })
   return Array.from(tags).sort()
+}
+
+export async function getNewsletterPosts(): Promise<BlogPostMeta[]> {
+  const allPosts = await getAllPosts()
+  return allPosts.filter(post => post.newsletter === true)
 }
