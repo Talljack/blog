@@ -44,9 +44,11 @@ export const metadata: Metadata = {
   // RSS和替代格式
   alternates: {
     canonical: process.env.SITE_URL || siteConfig.url,
-    types: {
-      'application/rss+xml': `${process.env.SITE_URL || siteConfig.url}/feed.xml`,
-    },
+    ...(siteConfig.features.enableRss && {
+      types: {
+        'application/rss+xml': `${process.env.SITE_URL || siteConfig.url}/feed.xml`,
+      },
+    }),
     languages: {
       'zh-CN': process.env.SITE_URL || siteConfig.url,
     },

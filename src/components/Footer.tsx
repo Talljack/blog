@@ -32,6 +32,19 @@ export default function Footer() {
             </p>
           </div>
 
+          {/* RSS 订阅链接 */}
+          {siteConfig.features.enableRss && (
+            <div className='text-xs text-gray-500 dark:text-gray-500'>
+              <a
+                href='/feed.xml'
+                target='_blank'
+                className='hover:text-gray-700 dark:hover:text-gray-300 transition-colors'
+              >
+                📡 RSS 订阅
+              </a>
+            </div>
+          )}
+
           {/* 技术栈信息 */}
           <div className='text-xs text-gray-400 dark:text-gray-600'>
             <p>
