@@ -1,6 +1,3 @@
-import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
 import Footer from '@/components/Footer'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import Header from '@/components/Header'
@@ -15,6 +12,9 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 import { siteConfig } from '@/lib/config'
 import { getDefaultMetadata } from '@/lib/metadata'
 import { viewport as defaultViewport } from '@/lib/viewport'
+import type { Metadata, Viewport } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -174,7 +174,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
-            <ScrollToTop threshold={300} />
+            <ScrollToTop threshold={200} />
             <OfflineIndicator />
             <PWAInstallPrompt />
           </div>

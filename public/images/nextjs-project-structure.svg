@@ -1,0 +1,67 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .folder { fill: #FFA726; stroke: #F57C00; stroke-width: 2; }
+      .file { fill: #42A5F5; stroke: #1976D2; stroke-width: 2; }
+      .text { font-family: 'JetBrains Mono', monospace; font-size: 14px; fill: #333; }
+      .title { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: bold; fill: #1976D2; }
+    </style>
+  </defs>
+  
+  <!-- Title -->
+  <text x="20" y="25" class="title">Next.js 项目结构</text>
+  
+  <!-- Root folder -->
+  <rect x="20" y="50" width="20" height="16" class="folder"/>
+  <text x="50" y="62" class="text">my-nextjs-app/</text>
+  
+  <!-- App folder -->
+  <rect x="40" y="80" width="20" height="16" class="folder"/>
+  <text x="70" y="92" class="text">app/</text>
+  
+  <!-- App files -->
+  <rect x="60" y="105" width="20" height="16" class="file"/>
+  <text x="90" y="117" class="text">layout.tsx</text>
+  <text x="200" y="117" class="text">← 根布局文件</text>
+  
+  <rect x="60" y="125" width="20" height="16" class="file"/>
+  <text x="90" y="137" class="text">page.tsx</text>
+  <text x="200" y="137" class="text">← 首页组件</text>
+  
+  <rect x="60" y="145" width="20" height="16" class="file"/>
+  <text x="90" y="157" class="text">globals.css</text>
+  <text x="200" y="157" class="text">← 全局样式</text>
+  
+  <!-- API folder -->
+  <rect x="60" y="170" width="20" height="16" class="folder"/>
+  <text x="90" y="182" class="text">api/</text>
+  <text x="200" y="182" class="text">← API 路由目录</text>
+  
+  <!-- Components folder -->
+  <rect x="40" y="200" width="20" height="16" class="folder"/>
+  <text x="70" y="212" class="text">components/</text>
+  <text x="200" y="212" class="text">← 可复用组件</text>
+  
+  <!-- Lib folder -->
+  <rect x="40" y="230" width="20" height="16" class="folder"/>
+  <text x="70" y="242" class="text">lib/</text>
+  <text x="200" y="242" class="text">← 工具函数</text>
+  
+  <!-- Public folder -->
+  <rect x="40" y="260" width="20" height="16" class="folder"/>
+  <text x="70" y="272" class="text">public/</text>
+  <text x="200" y="272" class="text">← 静态资源</text>
+  
+  <!-- Config files -->
+  <rect x="40" y="290" width="20" height="16" class="file"/>
+  <text x="70" y="302" class="text">next.config.js</text>
+  <text x="200" y="302" class="text">← Next.js 配置</text>
+  
+  <rect x="40" y="315" width="20" height="16" class="file"/>
+  <text x="70" y="327" class="text">package.json</text>
+  <text x="200" y="327" class="text">← 项目依赖</text>
+  
+  <rect x="40" y="340" width="20" height="16" class="file"/>
+  <text x="70" y="352" class="text">tailwind.config.js</text>
+  <text x="200" y="352" class="text">← 样式配置</text>
+</svg>
