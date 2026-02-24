@@ -76,9 +76,16 @@ export default function Comments({ slug, title }: CommentsProps) {
               lastUpdated: data.giscus.discussion.updatedAt,
             })
             setIsLoading(false)
+            setError(null) // 清除错误状态
           }
           if (data.giscus.error) {
-            setError(data.giscus.error)
+            // 如果是讨论不存在的错误，不显示为错误状态，因为这是正常的
+            if (data.giscus.error.includes('Discussion not found')) {
+              setStats({ count: 0 })
+              setError(null)
+            } else {
+              setError(data.giscus.error)
+            }
             setIsLoading(false)
           }
         }
