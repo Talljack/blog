@@ -29,7 +29,15 @@ export default function ViewCounter({
       try {
         const viewKey = `viewed-${slug}`
         const gaViewKey = `ga-viewed-${slug}`
-        const shouldIncrement = increment && !sessionStorage.getItem(viewKey)
+
+        // 检查是否在冷却期内（30分钟）
+        const lastViewTime = sessionStorage.getItem(`${viewKey}-time`)
+        const now = Date.now()
+        const COOLDOWN_TIME = 30 * 60 * 1000 // 30分钟
+
+        const shouldIncrement =
+          increment &&
+          (!lastViewTime || now - parseInt(lastViewTime) > COOLDOWN_TIME)
 
         let postSucceeded = false
 
@@ -47,13 +55,20 @@ export default function ViewCounter({
 
             if (postResponse.ok) {
               const postResult = await postResponse.json()
+              console.log('ViewCounter: POST response:', postResult)
               if (postResult.success && postResult.data) {
                 setViews(postResult.data.views || 0)
                 postSucceeded = true
               }
 
-              // 标记为已查看
+              // 标记为已查看，记录时间戳
+              console.log(
+                'ViewCounter: Setting sessionStorage keys:',
+                viewKey,
+                `${viewKey}-time`
+              )
               sessionStorage.setItem(viewKey, 'true')
+              sessionStorage.setItem(`${viewKey}-time`, now.toString())
 
               // 发送Google Analytics事件（包含实际浏览量数据）
               if (!sessionStorage.getItem(gaViewKey)) {
