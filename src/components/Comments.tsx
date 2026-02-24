@@ -49,8 +49,8 @@ export default function Comments({ slug, title }: CommentsProps) {
         'data-category-id',
         config.categoryId || 'your-category-id'
       )
-      script.setAttribute('data-mapping', 'pathname')
-      script.setAttribute('data-term', slug)
+      script.setAttribute('data-mapping', 'specific')
+      script.setAttribute('data-term', `${slug}: ${title}`)
       script.setAttribute('data-strict', '0')
       script.setAttribute('data-reactions-enabled', '1')
       script.setAttribute('data-emit-metadata', '1')
