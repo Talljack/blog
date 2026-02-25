@@ -188,6 +188,15 @@ export class BookmarksStorage {
         tweetIds = allIds as string[]
       }
 
+      if (tweetIds.length === 0) {
+        return {
+          tweets: [],
+          total: 0,
+          page,
+          limit,
+        }
+      }
+
       const pipeline = redis.pipeline()
       tweetIds.forEach((id) => {
         pipeline.hgetall(KEYS.tweet(id))
