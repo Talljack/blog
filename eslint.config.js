@@ -1,30 +1,17 @@
-const { FlatCompat } = require('@eslint/eslintrc')
+const nextCoreWebVitals = require('eslint-config-next/core-web-vitals')
 const typescriptEslint = require('@typescript-eslint/eslint-plugin')
 const typescriptParser = require('@typescript-eslint/parser')
-const importPlugin = require('eslint-plugin-import')
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-})
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 module.exports = [
-  ...compat.extends('next/core-web-vitals'),
+  ...nextCoreWebVitals,
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
       '@typescript-eslint': typescriptEslint,
-      import: importPlugin,
     },
     languageOptions: {
       parser: typescriptParser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
     },
     rules: {
       // === 代码质量规则 ===
@@ -64,9 +51,6 @@ module.exports = [
 
       // === 导入规则 ===
       'import/no-default-export': 'off', // Next.js 需要默认导出
-
-      // === 代码风格规则 (由 Prettier 处理) ===
-      // 移除可能与 Prettier 冲突的规则
 
       // === Next.js 特定规则 ===
       '@next/next/no-img-element': 'error',

@@ -2,11 +2,6 @@ import { Redis } from '@upstash/redis'
 import { Tweet, TweetListParams } from '@/types/bookmarks'
 import { extractTweetInfo } from './bookmarks-schema'
 
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '',
-  token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '',
-})
-
 const KEYS = {
   tweet: (id: string) => `tweet:${id}`,
   tweetsAll: 'tweets:all',
@@ -15,8 +10,19 @@ const KEYS = {
   allTags: 'tweets:tags:all',
 }
 
-const isVercelEnvironment = () => {
-  return process.env.VERCEL === '1' && process.env.KV_REST_API_URL
+function isRedisConfigured(): boolean {
+  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
+}
+
+let _redis: Redis | null = null
+function getRedis(): Redis {
+  if (!_redis) {
+    _redis = new Redis({
+      url: process.env.KV_REST_API_URL!,
+      token: process.env.KV_REST_API_TOKEN!,
+    })
+  }
+  return _redis
 }
 
 export class BookmarksStorage {
@@ -45,7 +51,8 @@ export class BookmarksStorage {
       isPublic: data.isPublic,
     }
 
-    if (isVercelEnvironment()) {
+    if (isRedisConfigured()) {
+      const redis = getRedis()
       const pipeline = redis.pipeline()
 
       pipeline.hset(KEYS.tweet(id), tweet as unknown as Record<string, unknown>)
@@ -55,7 +62,7 @@ export class BookmarksStorage {
         pipeline.sadd(KEYS.tweetsPublic, id)
       }
 
-      data.tags.forEach((tag) => {
+      data.tags.forEach(tag => {
         pipeline.sadd(KEYS.tweetsTag(tag), id)
         pipeline.sadd(KEYS.allTags, tag)
       })
@@ -69,12 +76,18 @@ export class BookmarksStorage {
   }
 
   async getTweet(id: string): Promise<Tweet | null> {
-    if (isVercelEnvironment()) {
-      const tweet = await redis.hgetall(KEYS.tweet(id))
-      if (!tweet || Object.keys(tweet).length === 0) {
-        return null
+    if (isRedisConfigured()) {
+      try {
+        const redis = getRedis()
+        const tweet = await redis.hgetall(KEYS.tweet(id))
+        if (!tweet || Object.keys(tweet).length === 0) {
+          return null
+        }
+        return tweet as unknown as Tweet
+      } catch (error) {
+        console.error('Redis getTweet error, falling back to file:', error)
+        return await this.getTweetFromFile(id)
       }
-      return tweet as unknown as Tweet
     } else {
       return await this.getTweetFromFile(id)
     }
@@ -105,20 +118,24 @@ export class BookmarksStorage {
       isPublic: newIsPublic,
     }
 
-    if (isVercelEnvironment()) {
+    if (isRedisConfigured()) {
+      const redis = getRedis()
       const pipeline = redis.pipeline()
 
-      pipeline.hset(KEYS.tweet(id), updatedTweet as unknown as Record<string, unknown>)
+      pipeline.hset(
+        KEYS.tweet(id),
+        updatedTweet as unknown as Record<string, unknown>
+      )
 
       if (updates.tags) {
-        const tagsToRemove = oldTags.filter((tag) => !newTags.includes(tag))
-        const tagsToAdd = newTags.filter((tag) => !oldTags.includes(tag))
+        const tagsToRemove = oldTags.filter(tag => !newTags.includes(tag))
+        const tagsToAdd = newTags.filter(tag => !oldTags.includes(tag))
 
-        tagsToRemove.forEach((tag) => {
+        tagsToRemove.forEach(tag => {
           pipeline.srem(KEYS.tweetsTag(tag), id)
         })
 
-        tagsToAdd.forEach((tag) => {
+        tagsToAdd.forEach(tag => {
           pipeline.sadd(KEYS.tweetsTag(tag), id)
           pipeline.sadd(KEYS.allTags, tag)
         })
@@ -146,14 +163,15 @@ export class BookmarksStorage {
       return false
     }
 
-    if (isVercelEnvironment()) {
+    if (isRedisConfigured()) {
+      const redis = getRedis()
       const pipeline = redis.pipeline()
 
       pipeline.del(KEYS.tweet(id))
       pipeline.zrem(KEYS.tweetsAll, id)
       pipeline.srem(KEYS.tweetsPublic, id)
 
-      tweet.tags.forEach((tag) => {
+      tweet.tags.forEach(tag => {
         pipeline.srem(KEYS.tweetsTag(tag), id)
       })
 
@@ -175,89 +193,134 @@ export class BookmarksStorage {
     const limit = params.limit ?? 20
     const offset = (page - 1) * limit
 
-    if (isVercelEnvironment()) {
-      let tweetIds: string[] = []
-
-      if (params.tag) {
-        const tagMembers = await redis.smembers(KEYS.tweetsTag(params.tag))
-        tweetIds = tagMembers as string[]
-      } else if (params.public) {
-        const publicMembers = await redis.smembers(KEYS.tweetsPublic)
-        tweetIds = publicMembers as string[]
-      } else {
-        const allIds = await redis.zrange(KEYS.tweetsAll, 0, -1, {
-          rev: true,
-        })
-        tweetIds = allIds as string[]
-      }
-
-      if (tweetIds.length === 0) {
-        return {
-          tweets: [],
-          total: 0,
-          page,
-          limit,
-        }
-      }
-
-      const pipeline = redis.pipeline()
-      tweetIds.forEach((id) => {
-        pipeline.hgetall(KEYS.tweet(id))
-      })
-      const results = await pipeline.exec()
-
-      let tweets = results
-        .filter((result) => result && typeof result === 'object')
-        .map((result) => result as Tweet)
-
-      if (params.q) {
-        const query = params.q.toLowerCase()
-        tweets = tweets.filter(
-          (tweet) =>
-            tweet.notes.toLowerCase().includes(query) ||
-            tweet.tags.some((tag) => tag.toLowerCase().includes(query)) ||
-            tweet.metadata?.text?.toLowerCase().includes(query)
-        )
-      }
-
-      const total = tweets.length
-      const paginatedTweets = tweets.slice(offset, offset + limit)
-
-      return {
-        tweets: paginatedTweets,
-        total,
-        page,
-        limit,
+    if (isRedisConfigured()) {
+      try {
+        return await this.listTweetsFromRedis(params, page, limit, offset)
+      } catch (error) {
+        console.error('Redis listTweets error, falling back to file:', error)
+        return await this.listTweetsFromFile(params, offset, limit)
       }
     } else {
       return await this.listTweetsFromFile(params, offset, limit)
     }
   }
 
+  private async listTweetsFromRedis(
+    params: TweetListParams,
+    page: number,
+    limit: number,
+    offset: number
+  ): Promise<{
+    tweets: Tweet[]
+    total: number
+    page: number
+    limit: number
+  }> {
+    const redis = getRedis()
+    let tweetIds: string[] = []
+
+    if (params.tag) {
+      const tagMembers = await redis.smembers(KEYS.tweetsTag(params.tag))
+      tweetIds = tagMembers as string[]
+    } else if (params.public) {
+      const publicMembers = await redis.smembers(KEYS.tweetsPublic)
+      tweetIds = publicMembers as string[]
+    } else {
+      const allIds = await redis.zrange(KEYS.tweetsAll, 0, -1, {
+        rev: true,
+      })
+      tweetIds = allIds as string[]
+    }
+
+    if (tweetIds.length === 0) {
+      return {
+        tweets: [],
+        total: 0,
+        page,
+        limit,
+      }
+    }
+
+    const pipeline = redis.pipeline()
+    tweetIds.forEach(id => {
+      pipeline.hgetall(KEYS.tweet(id))
+    })
+    const results = await pipeline.exec()
+
+    let tweets = results
+      .filter(
+        (result): result is Record<string, unknown> =>
+          result != null &&
+          typeof result === 'object' &&
+          Object.keys(result as object).length > 0
+      )
+      .map(result => result as unknown as Tweet)
+
+    if (params.q) {
+      const query = params.q.toLowerCase()
+      tweets = tweets.filter(
+        tweet =>
+          tweet.notes?.toLowerCase().includes(query) ||
+          tweet.tags?.some(tag => tag.toLowerCase().includes(query)) ||
+          tweet.metadata?.text?.toLowerCase().includes(query)
+      )
+    }
+
+    const total = tweets.length
+    const paginatedTweets = tweets.slice(offset, offset + limit)
+
+    return {
+      tweets: paginatedTweets,
+      total,
+      page,
+      limit,
+    }
+  }
+
   async getAllTags(): Promise<string[]> {
-    if (isVercelEnvironment()) {
-      const tags = await redis.smembers(KEYS.allTags)
-      return tags as string[]
+    if (isRedisConfigured()) {
+      try {
+        const redis = getRedis()
+        const tags = await redis.smembers(KEYS.allTags)
+        return tags as string[]
+      } catch (error) {
+        console.error('Redis getAllTags error, falling back to file:', error)
+        return await this.getAllTagsFromFile()
+      }
     } else {
       return await this.getAllTagsFromFile()
     }
   }
 
   async exportAllTweets(): Promise<Tweet[]> {
-    if (isVercelEnvironment()) {
-      const allIds = (await redis.zrange(KEYS.tweetsAll, 0, -1, {
-        rev: true,
-      })) as string[]
+    if (isRedisConfigured()) {
+      try {
+        const redis = getRedis()
+        const allIds = (await redis.zrange(KEYS.tweetsAll, 0, -1, {
+          rev: true,
+        })) as string[]
 
-      const pipeline = redis.pipeline()
-      allIds.forEach((id) => {
-        pipeline.hgetall(KEYS.tweet(id))
-      })
-      const results = await pipeline.exec()
+        const pipeline = redis.pipeline()
+        allIds.forEach(id => {
+          pipeline.hgetall(KEYS.tweet(id))
+        })
+        const results = await pipeline.exec()
 
-      return results
-        .filter((result) => result && typeof result === 'object')
-        .map((result) => result as Tweet)
+        return results
+          .filter(
+            (result): result is Record<string, unknown> =>
+              result != null &&
+              typeof result === 'object' &&
+              Object.keys(result as object).length > 0
+          )
+          .map(result => result as unknown as Tweet)
+      } catch (error) {
+        console.error(
+          'Redis exportAllTweets error, falling back to file:',
+          error
+        )
+        return await this.exportAllTweetsFromFile()
+      }
     } else {
       return await this.exportAllTweetsFromFile()
     }
@@ -300,10 +363,7 @@ export class BookmarksStorage {
     }
   }
 
-  private async updateTweetInFile(
-    id: string,
-    tweet: Tweet
-  ): Promise<void> {
+  private async updateTweetInFile(id: string, tweet: Tweet): Promise<void> {
     const { promises: fs } = await import('fs')
     const path = await import('path')
     const filePath = path.join(process.cwd(), 'data', 'bookmarks.json')
@@ -353,24 +413,23 @@ export class BookmarksStorage {
       let tweets = Object.values(data.tweets) as Tweet[]
 
       tweets.sort(
-        (a, b) =>
-          new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
+        (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
       )
 
       if (params.tag) {
-        tweets = tweets.filter((tweet) => tweet.tags.includes(params.tag!))
+        tweets = tweets.filter(tweet => tweet.tags.includes(params.tag!))
       }
 
       if (params.public) {
-        tweets = tweets.filter((tweet) => tweet.isPublic)
+        tweets = tweets.filter(tweet => tweet.isPublic)
       }
 
       if (params.q) {
         const query = params.q.toLowerCase()
         tweets = tweets.filter(
-          (tweet) =>
-            tweet.notes.toLowerCase().includes(query) ||
-            tweet.tags.some((tag) => tag.toLowerCase().includes(query)) ||
+          tweet =>
+            tweet.notes?.toLowerCase().includes(query) ||
+            tweet.tags?.some(tag => tag.toLowerCase().includes(query)) ||
             tweet.metadata?.text?.toLowerCase().includes(query)
         )
       }
@@ -404,8 +463,8 @@ export class BookmarksStorage {
       const data = JSON.parse(content)
       const tweets = Object.values(data.tweets) as Tweet[]
       const tagsSet = new Set<string>()
-      tweets.forEach((tweet) => {
-        tweet.tags.forEach((tag) => tagsSet.add(tag))
+      tweets.forEach(tweet => {
+        tweet.tags?.forEach(tag => tagsSet.add(tag))
       })
       return Array.from(tagsSet)
     } catch (error) {
@@ -423,8 +482,7 @@ export class BookmarksStorage {
       const data = JSON.parse(content)
       const tweets = Object.values(data.tweets) as Tweet[]
       tweets.sort(
-        (a, b) =>
-          new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
+        (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
       )
       return tweets
     } catch (error) {
