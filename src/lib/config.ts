@@ -18,6 +18,7 @@ export const siteConfig = {
     { name: '博客', href: '/blog' },
     { name: '课程', href: '/course' },
     { name: '模板', href: '/template' },
+    { name: '收藏', href: '/bookmarks' },
     { name: '关于', href: '/about' },
   ],
   seo: {
