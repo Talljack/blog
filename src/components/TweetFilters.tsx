@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useDebouncedCallback } from 'use-debounce'
 
 interface TweetFiltersProps {
@@ -11,6 +11,7 @@ interface TweetFiltersProps {
 
 export default function TweetFilters({ tags }: TweetFiltersProps) {
   const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const selectedTag = searchParams.get('tag') || ''
@@ -18,6 +19,10 @@ export default function TweetFilters({ tags }: TweetFiltersProps) {
   useEffect(() => {
     setSearchQuery(searchParams.get('q') || '')
   }, [searchParams])
+
+  const getBasePath = () => {
+    return pathname || '/bookmarks'
+  }
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -27,7 +32,7 @@ export default function TweetFilters({ tags }: TweetFiltersProps) {
       params.delete('q')
     }
     params.delete('page')
-    router.push(`/bookmarks?${params.toString()}`)
+    router.push(`${getBasePath()}?${params.toString()}`)
   }, 500)
 
   const handleSearchChange = (value: string) => {
@@ -43,12 +48,12 @@ export default function TweetFilters({ tags }: TweetFiltersProps) {
       params.set('tag', tag)
     }
     params.delete('page')
-    router.push(`/bookmarks?${params.toString()}`)
+    router.push(`${getBasePath()}?${params.toString()}`)
   }
 
   const handleClearFilters = () => {
     setSearchQuery('')
-    router.push('/bookmarks')
+    router.push(getBasePath())
   }
 
   const hasActiveFilters = searchQuery || selectedTag

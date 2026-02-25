@@ -188,12 +188,8 @@ export class BookmarksStorage {
         tweetIds = allIds as string[]
       }
 
-      const total = tweetIds.length
-
-      const paginatedIds = tweetIds.slice(offset, offset + limit)
-
       const pipeline = redis.pipeline()
-      paginatedIds.forEach((id) => {
+      tweetIds.forEach((id) => {
         pipeline.hgetall(KEYS.tweet(id))
       })
       const results = await pipeline.exec()
@@ -212,8 +208,11 @@ export class BookmarksStorage {
         )
       }
 
+      const total = tweets.length
+      const paginatedTweets = tweets.slice(offset, offset + limit)
+
       return {
-        tweets,
+        tweets: paginatedTweets,
         total,
         page,
         limit,

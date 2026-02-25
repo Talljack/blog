@@ -4,6 +4,19 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Bookmark, Copy, Check } from 'lucide-react'
 
+function getAuthHeaders(): HeadersInit {
+  const urlParams = new URLSearchParams(window.location.search)
+  const username = urlParams.get('username')
+  const password = urlParams.get('password')
+  
+  if (username && password) {
+    const credentials = btoa(`${username}:${password}`)
+    return { Authorization: `Basic ${credentials}` }
+  }
+  
+  return {}
+}
+
 export default function SaveTweetClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -33,7 +46,10 @@ export default function SaveTweetClient() {
 
       const response = await fetch('/api/bookmarks', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders(),
+        },
         body: JSON.stringify({
           url,
           tags: tagArray,

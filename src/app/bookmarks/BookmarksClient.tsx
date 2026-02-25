@@ -9,6 +9,19 @@ import { Tweet } from '@/types/bookmarks'
 import { Download, Plus } from 'lucide-react'
 import Link from 'next/link'
 
+function getAuthHeaders(): HeadersInit {
+  const urlParams = new URLSearchParams(window.location.search)
+  const username = urlParams.get('username')
+  const password = urlParams.get('password')
+  
+  if (username && password) {
+    const credentials = btoa(`${username}:${password}`)
+    return { Authorization: `Basic ${credentials}` }
+  }
+  
+  return {}
+}
+
 export default function BookmarksClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -24,7 +37,9 @@ export default function BookmarksClient() {
     try {
       setLoading(true)
       const params = new URLSearchParams(searchParams.toString())
-      const response = await fetch(`/api/bookmarks?${params.toString()}`)
+      const response = await fetch(`/api/bookmarks?${params.toString()}`, {
+        headers: getAuthHeaders(),
+      })
 
       if (response.status === 401) {
         setError('需要登录才能查看收藏')
@@ -49,7 +64,9 @@ export default function BookmarksClient() {
 
   const fetchTags = async () => {
     try {
-      const response = await fetch('/api/bookmarks/tags')
+      const response = await fetch('/api/bookmarks/tags', {
+        headers: getAuthHeaders(),
+      })
       if (response.ok) {
         const result = await response.json()
         const data = result.data || result
@@ -73,6 +90,7 @@ export default function BookmarksClient() {
     try {
       const response = await fetch(`/api/bookmarks/${tweetId}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
       })
 
       if (!response.ok) {
@@ -97,7 +115,10 @@ export default function BookmarksClient() {
     try {
       const response = await fetch(`/api/bookmarks/${tweetId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders(),
+        },
         body: JSON.stringify(updates),
       })
 
@@ -119,7 +140,9 @@ export default function BookmarksClient() {
 
   const handleExport = async (format: 'json' | 'markdown') => {
     try {
-      const response = await fetch(`/api/bookmarks/export?format=${format}`)
+      const response = await fetch(`/api/bookmarks/export?format=${format}`, {
+        headers: getAuthHeaders(),
+      })
       if (!response.ok) {
         throw new Error('Failed to export bookmarks')
       }
