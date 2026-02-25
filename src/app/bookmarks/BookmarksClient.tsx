@@ -13,12 +13,12 @@ function getAuthHeaders(): HeadersInit {
   const urlParams = new URLSearchParams(window.location.search)
   const username = urlParams.get('username')
   const password = urlParams.get('password')
-  
+
   if (username && password) {
     const credentials = btoa(`${username}:${password}`)
     return { Authorization: `Basic ${credentials}` }
   }
-  
+
   return {}
 }
 
@@ -32,6 +32,7 @@ export default function BookmarksClient() {
   const [editingTweet, setEditingTweet] = useState<Tweet | null>(null)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
+  const [limit] = useState(20)
 
   const fetchTweets = async () => {
     try {
@@ -97,7 +98,7 @@ export default function BookmarksClient() {
         throw new Error('Failed to delete bookmark')
       }
 
-      setTweets(tweets.filter((t) => t.id !== tweetId))
+      setTweets(tweets.filter(t => t.id !== tweetId))
       setTotal(total - 1)
     } catch (err) {
       alert('删除失败：' + (err instanceof Error ? err.message : '未知错误'))
@@ -128,9 +129,7 @@ export default function BookmarksClient() {
 
       const result = await response.json()
       const updatedTweet = result.data || result
-      setTweets(
-        tweets.map((t) => (t.id === tweetId ? updatedTweet : t))
-      )
+      setTweets(tweets.map(t => (t.id === tweetId ? updatedTweet : t)))
       setEditingTweet(null)
       fetchTags()
     } catch (err) {
@@ -163,8 +162,8 @@ export default function BookmarksClient() {
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <p className="text-red-600 dark:text-red-400">{error}</p>
+      <div className='text-center py-12' role='alert'>
+        <p className='text-red-600 dark:text-red-400'>{error}</p>
       </div>
     )
   }
@@ -172,36 +171,36 @@ export default function BookmarksClient() {
   return (
     <>
       {/* Actions Bar */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-2">
+      <div className='flex items-center justify-between mb-6'>
+        <div className='flex items-center space-x-2'>
           <Link
-            href="/bookmarks/save"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            href='/bookmarks/save'
+            className='inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium'
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className='h-4 w-4 mr-2' />
             添加推文
           </Link>
           <Link
-            href="/bookmarks/public"
-            className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
+            href='/bookmarks/public'
+            className='inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium'
           >
             公开收藏
           </Link>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className='flex items-center space-x-2'>
           <button
             onClick={() => handleExport('json')}
-            className="inline-flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-sm"
+            className='inline-flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-sm'
           >
-            <Download className="h-4 w-4 mr-2" />
+            <Download className='h-4 w-4 mr-2' />
             JSON
           </button>
           <button
             onClick={() => handleExport('markdown')}
-            className="inline-flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-sm"
+            className='inline-flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-sm'
           >
-            <Download className="h-4 w-4 mr-2" />
+            <Download className='h-4 w-4 mr-2' />
             Markdown
           </button>
         </div>
@@ -211,31 +210,29 @@ export default function BookmarksClient() {
       <TweetFilters tags={tags} />
 
       {/* Stats */}
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+      <div className='mb-4 text-sm text-gray-600 dark:text-gray-400'>
         共 {total} 条推文收藏
       </div>
 
       {/* Tweet List */}
       {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">加载中...</p>
+        <div className='text-center py-12'>
+          <div className='inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent' />
+          <p className='mt-4 text-gray-600 dark:text-gray-400'>加载中...</p>
         </div>
       ) : tweets.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 dark:text-gray-400">
-            还没有收藏任何推文
-          </p>
+        <div className='text-center py-12'>
+          <p className='text-gray-600 dark:text-gray-400'>还没有收藏任何推文</p>
           <Link
-            href="/bookmarks/save"
-            className="inline-block mt-4 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            href='/bookmarks/save'
+            className='inline-block mt-4 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'
           >
             开始添加 →
           </Link>
         </div>
       ) : (
-        <div className="space-y-0">
-          {tweets.map((tweet) => (
+        <div className='space-y-0'>
+          {tweets.map(tweet => (
             <TweetCard
               key={tweet.id}
               tweet={tweet}
@@ -254,6 +251,37 @@ export default function BookmarksClient() {
           onClose={() => setEditingTweet(null)}
           onSave={handleSaveEdit}
         />
+      )}
+
+      {/* Pagination */}
+      {total > limit && (
+        <div className='flex items-center justify-center space-x-4 mt-8 pt-4 border-t border-gray-200 dark:border-gray-700'>
+          <button
+            onClick={() => {
+              const params = new URLSearchParams(searchParams.toString())
+              params.set('page', String(page - 1))
+              router.push(`/bookmarks?${params.toString()}`)
+            }}
+            disabled={page <= 1}
+            className='px-4 py-2 min-h-[44px] text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer'
+          >
+            上一页
+          </button>
+          <span className='text-sm text-gray-600 dark:text-gray-400'>
+            第 {page} / {Math.ceil(total / limit)} 页
+          </span>
+          <button
+            onClick={() => {
+              const params = new URLSearchParams(searchParams.toString())
+              params.set('page', String(page + 1))
+              router.push(`/bookmarks?${params.toString()}`)
+            }}
+            disabled={page >= Math.ceil(total / limit)}
+            className='px-4 py-2 min-h-[44px] text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer'
+          >
+            下一页
+          </button>
+        </div>
       )}
     </>
   )
