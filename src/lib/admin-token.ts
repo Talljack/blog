@@ -7,10 +7,12 @@ export function getAdminToken(): string | null {
 
 export function setAdminToken(token: string): void {
   localStorage.setItem(ADMIN_TOKEN_KEY, token)
+  document.cookie = `${ADMIN_TOKEN_KEY}=${token}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`
 }
 
 export function removeAdminToken(): void {
   localStorage.removeItem(ADMIN_TOKEN_KEY)
+  document.cookie = `${ADMIN_TOKEN_KEY}=; path=/; max-age=0`
 }
 
 export function isAdmin(): boolean {
