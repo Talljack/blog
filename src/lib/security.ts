@@ -158,7 +158,7 @@ export function createSuccessResponse(
 
   const responseHeaders = {
     'Content-Type': 'application/json',
-    'Cache-Control': 'public, max-age=60, s-maxage=60',
+    'Cache-Control': 'no-store, no-cache, must-revalidate',
     ...headers,
   }
 
