@@ -1,9 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { bookmarksStorage } from '@/lib/bookmarks-storage'
-import {
-  saveTweetSchema,
-  tweetListParamsSchema,
-} from '@/lib/bookmarks-schema'
+import { saveTweetSchema, tweetListParamsSchema } from '@/lib/bookmarks-schema'
 import { hasAdminAccess } from '@/lib/auth'
 import {
   createErrorResponse,
@@ -28,8 +25,9 @@ export async function GET(request: NextRequest) {
 
     const params = tweetListParamsSchema.parse(paramsObj)
 
+    // 未认证时默认返回公开推文
     if (!params.public && !hasAdminAccess(request)) {
-      return createErrorResponse('Unauthorized', 401)
+      params.public = true
     }
 
     const result = await bookmarksStorage.listTweets(params)

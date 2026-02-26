@@ -8,17 +8,13 @@ import EditTweetModal from '@/components/EditTweetModal'
 import { Tweet } from '@/types/bookmarks'
 import { Download, Plus } from 'lucide-react'
 import Link from 'next/link'
+import { getAdminToken, isAdmin } from '@/lib/admin-token'
 
 function getAuthHeaders(): HeadersInit {
-  const urlParams = new URLSearchParams(window.location.search)
-  const username = urlParams.get('username')
-  const password = urlParams.get('password')
-
-  if (username && password) {
-    const credentials = btoa(`${username}:${password}`)
-    return { Authorization: `Basic ${credentials}` }
+  const token = getAdminToken()
+  if (token) {
+    return { Authorization: `Bearer ${token}` }
   }
-
   return {}
 }
 
@@ -33,6 +29,11 @@ export default function BookmarksClient() {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [limit] = useState(20)
+  const [admin, setAdmin] = useState(false)
+
+  useEffect(() => {
+    setAdmin(isAdmin())
+  }, [])
 
   const fetchTweets = async () => {
     try {
@@ -41,11 +42,6 @@ export default function BookmarksClient() {
       const response = await fetch(`/api/bookmarks?${params.toString()}`, {
         headers: getAuthHeaders(),
       })
-
-      if (response.status === 401) {
-        setError('需要登录才能查看收藏')
-        return
-      }
 
       if (!response.ok) {
         throw new Error('Failed to fetch bookmarks')
@@ -173,37 +169,35 @@ export default function BookmarksClient() {
       {/* Actions Bar */}
       <div className='flex items-center justify-between mb-6'>
         <div className='flex items-center space-x-2'>
-          <Link
-            href='/bookmarks/save'
-            className='inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium'
-          >
-            <Plus className='h-4 w-4 mr-2' />
-            添加推文
-          </Link>
-          <Link
-            href='/bookmarks/public'
-            className='inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium'
-          >
-            公开收藏
-          </Link>
+          {admin && (
+            <Link
+              href='/bookmarks/save'
+              className='inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium'
+            >
+              <Plus className='h-4 w-4 mr-2' />
+              添加推文
+            </Link>
+          )}
         </div>
 
-        <div className='flex items-center space-x-2'>
-          <button
-            onClick={() => handleExport('json')}
-            className='inline-flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-sm'
-          >
-            <Download className='h-4 w-4 mr-2' />
-            JSON
-          </button>
-          <button
-            onClick={() => handleExport('markdown')}
-            className='inline-flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-sm'
-          >
-            <Download className='h-4 w-4 mr-2' />
-            Markdown
-          </button>
-        </div>
+        {admin && (
+          <div className='flex items-center space-x-2'>
+            <button
+              onClick={() => handleExport('json')}
+              className='inline-flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-sm'
+            >
+              <Download className='h-4 w-4 mr-2' />
+              JSON
+            </button>
+            <button
+              onClick={() => handleExport('markdown')}
+              className='inline-flex items-center px-3 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors text-sm'
+            >
+              <Download className='h-4 w-4 mr-2' />
+              Markdown
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Filters */}
@@ -223,12 +217,14 @@ export default function BookmarksClient() {
       ) : tweets.length === 0 ? (
         <div className='text-center py-12'>
           <p className='text-gray-600 dark:text-gray-400'>还没有收藏任何推文</p>
-          <Link
-            href='/bookmarks/save'
-            className='inline-block mt-4 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'
-          >
-            开始添加 →
-          </Link>
+          {admin && (
+            <Link
+              href='/bookmarks/save'
+              className='inline-block mt-4 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'
+            >
+              开始添加 →
+            </Link>
+          )}
         </div>
       ) : (
         <div className='space-y-0'>
@@ -236,7 +232,7 @@ export default function BookmarksClient() {
             <TweetCard
               key={tweet.id}
               tweet={tweet}
-              showActions={true}
+              showActions={admin}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />
