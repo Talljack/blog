@@ -107,12 +107,16 @@ test.describe('书签页面 UI 改进验证', () => {
   // ============================================
   test.describe('分页控件', () => {
     test('API 返回 total > 20 时页面显示分页按钮', async ({ page }) => {
-      // 拦截 API 返回模拟数据 (25条，超过 limit=20)
+      const adminToken = btoa('admin:zz1234zz')
+      await page.context().addCookies([
+        {
+          name: 'admin_token',
+          value: adminToken,
+          domain: 'localhost',
+          path: '/',
+        },
+      ])
       await page.route('**/api/bookmarks?**', async route => {
-        const url = new URL(route.request().url())
-        const isPublic = url.searchParams.get('public')
-
-        // 生成模拟推文数据
         const tweets = Array.from({ length: 20 }, (_, i) => ({
           id: `user-${i + 1}`,
           url: `https://x.com/user/status/${1000 + i}`,
@@ -123,22 +127,19 @@ test.describe('书签页面 UI 改进验证', () => {
           notes: `Test tweet ${i + 1}`,
           isPublic: true,
         }))
-
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
           body: JSON.stringify({
             data: {
               tweets,
-              total: 25, // 超过 limit=20，应触发分页
+              total: 25,
               page: 1,
               limit: 20,
             },
           }),
         })
       })
-
-      // 也拦截 tags API
       await page.route('**/api/bookmarks/tags**', async route => {
         await route.fulfill({
           status: 200,
@@ -146,7 +147,6 @@ test.describe('书签页面 UI 改进验证', () => {
           body: JSON.stringify({ data: { tags: ['test'] } }),
         })
       })
-
       await page.goto('/bookmarks')
       await page.waitForLoadState('networkidle')
 
@@ -169,6 +169,15 @@ test.describe('书签页面 UI 改进验证', () => {
     })
 
     test('API 返回 total <= 20 时不显示分页', async ({ page }) => {
+      const adminToken = btoa('admin:zz1234zz')
+      await page.context().addCookies([
+        {
+          name: 'admin_token',
+          value: adminToken,
+          domain: 'localhost',
+          path: '/',
+        },
+      ])
       await page.route('**/api/bookmarks?**', async route => {
         const tweets = Array.from({ length: 5 }, (_, i) => ({
           id: `user-${i + 1}`,
@@ -180,7 +189,6 @@ test.describe('书签页面 UI 改进验证', () => {
           notes: `Test tweet ${i + 1}`,
           isPublic: true,
         }))
-
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -194,7 +202,6 @@ test.describe('书签页面 UI 改进验证', () => {
           }),
         })
       })
-
       await page.route('**/api/bookmarks/tags**', async route => {
         await route.fulfill({
           status: 200,
@@ -202,7 +209,6 @@ test.describe('书签页面 UI 改进验证', () => {
           body: JSON.stringify({ data: { tags: ['test'] } }),
         })
       })
-
       await page.goto('/bookmarks')
       await page.waitForLoadState('networkidle')
 

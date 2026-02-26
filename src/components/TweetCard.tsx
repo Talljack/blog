@@ -10,6 +10,7 @@ interface TweetCardProps {
   showActions?: boolean
   onEdit?: (tweet: Tweet) => void
   onDelete?: (tweetId: string) => void
+  onTogglePublic?: (tweetId: string, isPublic: boolean) => void
 }
 
 function loadTwitterWidgets(container: HTMLElement) {
@@ -50,6 +51,7 @@ export default function TweetCard({
   showActions = false,
   onEdit,
   onDelete,
+  onTogglePublic,
 }: TweetCardProps) {
   const tweetRef = useRef<HTMLDivElement>(null)
   const [embedLoaded, setEmbedLoaded] = useState(false)
@@ -144,14 +146,32 @@ export default function TweetCard({
               <time dateTime={tweet.savedAt}>
                 保存于 {formatDateChinese(tweet.savedAt)}
               </time>
-              {tweet.isPublic && (
+              {showActions && onTogglePublic ? (
+                <>
+                  <span>·</span>
+                  <button
+                    onClick={() => onTogglePublic(tweet.id, !tweet.isPublic)}
+                    className='cursor-pointer hover:underline'
+                  >
+                    {tweet.isPublic ? (
+                      <span className='text-green-600 dark:text-green-400'>
+                        公开
+                      </span>
+                    ) : (
+                      <span className='text-gray-400 dark:text-gray-500'>
+                        私有
+                      </span>
+                    )}
+                  </button>
+                </>
+              ) : tweet.isPublic ? (
                 <>
                   <span>·</span>
                   <span className='text-green-600 dark:text-green-400'>
                     公开
                   </span>
                 </>
-              )}
+              ) : null}
             </div>
 
             {showActions && (

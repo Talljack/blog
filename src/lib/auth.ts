@@ -90,6 +90,14 @@ export function getAuthFromRequest(request: Request): AdminCredentials | null {
     return parseAuthToken(token)
   }
 
+  // 方式5: Cookie中的admin_token
+  const cookieHeader = request.headers.get('Cookie')
+  if (cookieHeader) {
+    const match = cookieHeader.match(/(?:^|;\s*)admin_token=([^;]+)/)
+    if (match) {
+      return parseAuthToken(decodeURIComponent(match[1]))
+    }
+  }
   return null
 }
 

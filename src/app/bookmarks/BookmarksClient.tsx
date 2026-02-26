@@ -100,6 +100,19 @@ export default function BookmarksClient() {
       alert('删除失败：' + (err instanceof Error ? err.message : '未知错误'))
     }
   }
+  const handleTogglePublic = async (tweetId: string, isPublic: boolean) => {
+    try {
+      const response = await fetch(`/api/bookmarks/${tweetId}`, {
+        method: 'PATCH',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublic }),
+      })
+      if (!response.ok) throw new Error('Failed to update')
+      setTweets(tweets.map(t => (t.id === tweetId ? { ...t, isPublic } : t)))
+    } catch (err) {
+      alert('更新失败：' + (err instanceof Error ? err.message : '未知错误'))
+    }
+  }
 
   const handleEdit = (tweet: Tweet) => {
     setEditingTweet(tweet)
@@ -235,6 +248,7 @@ export default function BookmarksClient() {
               showActions={admin}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onTogglePublic={handleTogglePublic}
             />
           ))}
         </div>
