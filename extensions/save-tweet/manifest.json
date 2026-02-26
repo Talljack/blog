@@ -3,7 +3,7 @@
   "name": "Save Tweet to Blog",
   "version": "1.0.0",
   "description": "Save X/Twitter tweets to your blog bookmarks",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "tabs"],
   "host_permissions": [
     "https://talljack.me/*",
     "https://www.talljack.me/*",
