@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        width: 320px;
+        padding: 16px;
+        color: #1a1a1a;
+      }
+      h3 {
+        font-size: 15px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .url {
+        font-size: 12px;
+        color: #666;
+        word-break: break-all;
+        margin-bottom: 12px;
+        padding: 6px 8px;
+        background: #f5f5f5;
+        border-radius: 4px;
+      }
+      label {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        margin-bottom: 3px;
+        color: #555;
+      }
+      input[type='text'] {
+        width: 100%;
+        padding: 7px 9px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+      input:focus {
+        outline: none;
+        border-color: #1d9bf0;
+      }
+      .hint {
+        font-size: 11px;
+        color: #999;
+        margin: -6px 0 10px;
+      }
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 14px;
+        font-size: 12px;
+      }
+      .checkbox-row input {
+        margin: 0;
+      }
+      button {
+        width: 100%;
+        background: #1d9bf0;
+        color: #fff;
+        border: none;
+        padding: 9px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #1a8cd8;
+      }
+      button:disabled {
+        background: #93c5fd;
+        cursor: not-allowed;
+      }
+      .msg {
+        text-align: center;
+        padding: 20px 10px;
+        font-size: 13px;
+        color: #666;
+      }
+      .msg a {
+        color: #1d9bf0;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .status {
+        font-size: 12px;
+        text-align: center;
+        margin-top: 8px;
+      }
+      .success {
+        color: #16a34a;
+      }
+      .error {
+        color: #dc2626;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="no-token" class="msg hidden">
+      No admin token configured.<br />
+      <a id="open-options">Open Settings</a>
+    </div>
+    <div id="not-tweet" class="msg hidden">
+      Not a tweet page.<br />
+      <span style="font-size: 11px; color: #999"
+        >Open a tweet on X/Twitter, then click this icon.</span
+      >
+    </div>
+    <div id="form" class="hidden">
+      <h3>Save Tweet</h3>
+      <div class="url" id="tweet-url"></div>
+      <label for="tags">Tags</label>
+      <input type="text" id="tags" placeholder="e.g. react, typescript" />
+      <p class="hint">Comma-separated</p>
+      <label for="notes">Notes</label>
+      <input type="text" id="notes" placeholder="Optional note" />
+      <div class="checkbox-row">
+        <input type="checkbox" id="isPublic" />
+        <label for="isPublic" style="margin: 0">Public</label>
+      </div>
+      <button id="save-btn">Save Bookmark</button>
+      <p class="status hidden" id="status"></p>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
