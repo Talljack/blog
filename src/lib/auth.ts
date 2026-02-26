@@ -77,10 +77,16 @@ export function getAuthFromRequest(request: Request): AdminCredentials | null {
     return { username, password }
   }
 
-  // 方式3: Authorization header
+  // 方式3: Authorization header (Basic)
   const authHeader = request.headers.get('Authorization')
   if (authHeader && authHeader.startsWith('Basic ')) {
     const token = authHeader.substring(6)
+    return parseAuthToken(token)
+  }
+
+  // 方式4: Authorization header (Bearer) - token 格式与 Basic 一致 (base64(username:password))
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7)
     return parseAuthToken(token)
   }
 

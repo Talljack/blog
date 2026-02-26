@@ -1,19 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Bookmark, Copy, Check } from 'lucide-react'
+import { getAdminToken, isAdmin } from '@/lib/admin-token'
 
 function getAuthHeaders(): HeadersInit {
-  const urlParams = new URLSearchParams(window.location.search)
-  const username = urlParams.get('username')
-  const password = urlParams.get('password')
-
-  if (username && password) {
-    const credentials = btoa(`${username}:${password}`)
-    return { Authorization: `Basic ${credentials}` }
+  const token = getAdminToken()
+  if (token) {
+    return { Authorization: `Bearer ${token}` }
   }
-
   return {}
 }
 
@@ -95,6 +91,24 @@ export default function SaveTweetClient() {
             保存成功！
           </h2>
           <p className='text-gray-600 dark:text-gray-400'>推文已添加到收藏</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAdmin()) {
+    return (
+      <div className='min-h-screen flex items-center justify-center p-4'>
+        <div className='text-center'>
+          <h2 className='text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2'>
+            需要管理员权限
+          </h2>
+          <p className='text-gray-600 dark:text-gray-400 mb-4'>
+            请在浏览器控制台设置 admin_token 后刷新页面
+          </p>
+          <code className='block bg-gray-100 dark:bg-gray-800 text-sm p-3 rounded-lg text-left'>
+            {`localStorage.setItem('admin_token', btoa('username:password'))`}
+          </code>
         </div>
       </div>
     )
