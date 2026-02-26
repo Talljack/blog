@@ -3,10 +3,20 @@
 import { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Bookmark, Copy, Check } from 'lucide-react'
-import { getAdminToken, isAdmin } from '@/lib/admin-token'
+import { getAdminToken, setAdminToken } from '@/lib/admin-token'
 
-function getAuthHeaders(): HeadersInit {
-  const token = getAdminToken()
+function getAuthToken(searchParams: URLSearchParams): string | null {
+  // Priority: URL token param > localStorage
+  const urlToken = searchParams.get('token')
+  if (urlToken) {
+    // Persist token from URL to localStorage for future use
+    setAdminToken(urlToken)
+    return urlToken
+  }
+  return getAdminToken()
+}
+
+function makeAuthHeaders(token: string | null): HeadersInit {
   if (token) {
     return { Authorization: `Bearer ${token}` }
   }
@@ -17,6 +27,7 @@ export default function SaveTweetClient() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const urlParam = searchParams.get('url')
+  const authToken = getAuthToken(searchParams)
 
   const [url, setUrl] = useState(urlParam || '')
   const [tags, setTags] = useState('')
@@ -44,7 +55,7 @@ export default function SaveTweetClient() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...getAuthHeaders(),
+          ...makeAuthHeaders(authToken),
         },
         body: JSON.stringify({
           url,
@@ -96,7 +107,7 @@ export default function SaveTweetClient() {
     )
   }
 
-  if (!isAdmin()) {
+  if (!authToken) {
     return (
       <div className='min-h-screen flex items-center justify-center p-4'>
         <div className='text-center'>
