@@ -6,6 +6,7 @@ import TweetCard from '@/components/TweetCard'
 import TweetFilters from '@/components/TweetFilters'
 import { Tweet } from '@/types/bookmarks'
 import Link from 'next/link'
+import { isAdmin, getAdminToken } from '@/lib/admin-token'
 
 export default function PublicBookmarksClient() {
   const searchParams = useSearchParams()
@@ -14,6 +15,7 @@ export default function PublicBookmarksClient() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [total, setTotal] = useState(0)
+  const [admin, setAdmin] = useState(false)
 
   const fetchTweets = async () => {
     try {
@@ -42,6 +44,26 @@ export default function PublicBookmarksClient() {
       )
     } finally {
       setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    setAdmin(isAdmin())
+  }, [])
+
+  const handleDelete = async (tweetId: string) => {
+    if (!confirm('确定要删除这条推文收藏吗？')) return
+    try {
+      const token = getAdminToken()
+      const response = await fetch(`/api/bookmarks/${tweetId}`, {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      if (!response.ok) throw new Error('Failed to delete')
+      setTweets(tweets.filter(t => t.id !== tweetId))
+      setTotal(total - 1)
+    } catch (err) {
+      alert('删除失败：' + (err instanceof Error ? err.message : '未知错误'))
     }
   }
 
@@ -109,7 +131,12 @@ export default function PublicBookmarksClient() {
       ) : (
         <div className='space-y-0'>
           {tweets.map(tweet => (
-            <TweetCard key={tweet.id} tweet={tweet} showActions={false} />
+            <TweetCard
+              key={tweet.id}
+              tweet={tweet}
+              showActions={admin}
+              onDelete={admin ? handleDelete : undefined}
+            />
           ))}
         </div>
       )}
