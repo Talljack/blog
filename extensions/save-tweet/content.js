@@ -175,28 +175,34 @@ async function saveTweet(btn, url) {
   btn.innerHTML =
     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="32"><animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="rotate" values="0 12 12;360 12 12" dur="1s" repeatCount="indefinite"/></circle></svg>'
   try {
-    const resp = await chrome.runtime.sendMessage({
-      type: 'SAVE_TWEET',
-      url: url,
+    const config = await chrome.storage.sync.get(['apiUrl', 'token'])
+    if (!config.token)
+      throw new Error('No token configured. Open extension options.')
+    const base = (config.apiUrl || 'https://www.talljack.me').replace(
+      /\/+$/,
+      ''
+    )
+    const res = await fetch(base + '/api/bookmarks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + config.token,
+      },
+      body: JSON.stringify({ url: url, tags: [], notes: '', isPublic: true }),
     })
-    if (resp && resp.error) throw new Error(resp.error)
-
+    if (!res.ok) {
+      const body = await res.json().catch(function () {
+        return {}
+      })
+      throw new Error(body.error || 'HTTP ' + res.status)
+    }
     markTweetSaved(url)
     btn.innerHTML = SAVED_SVG
     btn.style.color = '#00ba7c'
     btn.style.background = 'transparent'
     btn.dataset.saved = 'true'
     btn.title = 'Already saved to Blog'
-
-    let blogUrl = ''
-    try {
-      const config = await chrome.storage.sync.get(['apiUrl'])
-      blogUrl =
-        (config.apiUrl || 'https://www.talljack.me').replace(/\/+$/, '') +
-        '/bookmarks/public'
-    } catch (e) {
-      blogUrl = ''
-    }
+    const blogUrl = base + '/bookmarks/public'
     showToast('推文已保存到博客', blogUrl)
   } catch (err) {
     btn.innerHTML = BLOG_SVG
