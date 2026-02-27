@@ -98,23 +98,32 @@ export default function TweetCard({
         </div>
 
         {!embedLoaded && (
-          <div className='flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700'>
-            <svg
-              className='w-5 h-5 text-blue-400 shrink-0'
-              viewBox='0 0 24 24'
-              fill='currentColor'
-              aria-hidden='true'
-            >
-              <path d='M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' />
-            </svg>
-            <a
-              href={tweet.url}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium'
-            >
-              查看 @{tweet.authorUsername} 的推文 →
-            </a>
+          <div className='flex flex-col gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700'>
+            {tweet.metadata?.text && (
+              <p className='text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap break-words'>
+                {tweet.metadata.text.length > 280
+                  ? tweet.metadata.text.slice(0, 280) + '…'
+                  : tweet.metadata.text}
+              </p>
+            )}
+            <div className='flex items-center gap-3'>
+              <svg
+                className='w-4 h-4 text-blue-400 shrink-0'
+                viewBox='0 0 24 24'
+                fill='currentColor'
+                aria-hidden='true'
+              >
+                <path d='M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' />
+              </svg>
+              <a
+                href={tweet.url}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium'
+              >
+                查看 @{tweet.authorUsername} 的推文 →
+              </a>
+            </div>
           </div>
         )}
 

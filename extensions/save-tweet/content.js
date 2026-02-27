@@ -45,6 +45,12 @@ function isTweetSaved(url) {
   return !!data[url]
 }
 
+function getTweetText(article) {
+  const textEl = article.querySelector('[data-testid="tweetText"]')
+  if (!textEl) return ''
+  return (textEl.innerText || textEl.textContent || '').trim()
+}
+
 function getTweetUrl(article) {
   const links = article.querySelectorAll('a[href*="/status/"]')
   for (let i = 0; i < links.length; i++) {
@@ -130,7 +136,7 @@ function showToast(message, blogUrl) {
   }, 5000)
 }
 
-function createSaveButton(tweetUrl) {
+function createSaveButton(article, tweetUrl) {
   const alreadySaved = isTweetSaved(tweetUrl)
   const btn = document.createElement('button')
   btn.className = 'blog-save-btn'
@@ -165,44 +171,43 @@ function createSaveButton(tweetUrl) {
       showToast('这条推文已经保存过了', null)
       return
     }
-    saveTweet(btn, tweetUrl)
+    saveTweet(btn, tweetUrl, getTweetText(article))
   })
   return btn
 }
 
-async function saveTweet(btn, url) {
+async function saveTweet(btn, url, text) {
   btn.disabled = true
   btn.innerHTML =
     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="32"><animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="rotate" values="0 12 12;360 12 12" dur="1s" repeatCount="indefinite"/></circle></svg>'
   try {
-    const config = await chrome.storage.sync.get(['apiUrl', 'token'])
-    if (!config.token)
-      throw new Error('No token configured. Open extension options.')
-    const base = (config.apiUrl || 'https://www.talljack.me').replace(
-      /\/+$/,
-      ''
-    )
-    const res = await fetch(base + '/api/bookmarks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + config.token,
-      },
-      body: JSON.stringify({ url: url, tags: [], notes: '', isPublic: true }),
+    const result = await new Promise(function (resolve, reject) {
+      chrome.runtime.sendMessage(
+        { type: 'SAVE_TWEET', url: url, text: text },
+        function (response) {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message))
+            return
+          }
+          if (!response) {
+            reject(new Error('No response from extension background'))
+            return
+          }
+          if (response.error) {
+            reject(new Error(response.error))
+            return
+          }
+          resolve(response)
+        }
+      )
     })
-    if (!res.ok) {
-      const body = await res.json().catch(function () {
-        return {}
-      })
-      throw new Error(body.error || 'HTTP ' + res.status)
-    }
     markTweetSaved(url)
     btn.innerHTML = SAVED_SVG
     btn.style.color = '#00ba7c'
     btn.style.background = 'transparent'
     btn.dataset.saved = 'true'
     btn.title = 'Already saved to Blog'
-    const blogUrl = base + '/bookmarks/public'
+    const blogUrl = result.base ? result.base + '/bookmarks/public' : null
     showToast('推文已保存到博客', blogUrl)
   } catch (err) {
     btn.innerHTML = BLOG_SVG
@@ -230,7 +235,7 @@ function processArticles() {
     article.setAttribute(PROCESSED_ATTR, 'true')
     const wrapper = document.createElement('div')
     wrapper.style.cssText = 'display:inline-flex;align-items:center;'
-    wrapper.appendChild(createSaveButton(tweetUrl))
+    wrapper.appendChild(createSaveButton(article, tweetUrl))
     actionBar.appendChild(wrapper)
   }
 }

@@ -4,10 +4,8 @@ export const tweetUrlSchema = z
   .string()
   .url()
   .refine(
-    (url) => {
-      const match = url.match(
-        /(?:twitter\.com|x\.com)\/(\w+)\/status\/(\d+)/
-      )
+    url => {
+      const match = url.match(/(?:twitter\.com|x\.com)\/(\w+)\/status\/(\d+)/)
       return match !== null
     },
     {
@@ -20,6 +18,12 @@ export const saveTweetSchema = z.object({
   tags: z.array(z.string().min(1).max(50)).max(10).optional().default([]),
   notes: z.string().max(5000).optional().default(''),
   isPublic: z.boolean().optional().default(false),
+  metadata: z
+    .object({
+      authorName: z.string().max(100).optional(),
+      text: z.string().max(5000).optional(),
+    })
+    .optional(),
 })
 
 export const updateTweetSchema = z.object({
