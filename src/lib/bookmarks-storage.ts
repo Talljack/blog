@@ -31,6 +31,10 @@ export class BookmarksStorage {
     tags: string[]
     notes: string
     isPublic: boolean
+    metadata?: {
+      authorName?: string
+      text?: string
+    }
   }): Promise<Tweet> {
     const tweetInfo = extractTweetInfo(data.url)
     if (!tweetInfo) {
@@ -49,6 +53,7 @@ export class BookmarksStorage {
       tags: data.tags,
       notes: data.notes,
       isPublic: data.isPublic,
+      ...(data.metadata && { metadata: data.metadata }),
     }
 
     if (isRedisConfigured()) {
