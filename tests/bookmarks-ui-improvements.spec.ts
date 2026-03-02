@@ -1,6 +1,130 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('书签页面 UI 改进验证', () => {
+  test.describe('推文预览展示', () => {
+    test('bookmarks 列表优先展示推文摘要，再展示链接', async ({ page }) => {
+      const adminToken = btoa('admin:zz1234zz')
+      await page.context().addCookies([
+        {
+          name: 'admin_token',
+          value: adminToken,
+          domain: 'localhost',
+          path: '/',
+        },
+      ])
+
+      await page.route('**/api/bookmarks?**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              tweets: [
+                {
+                  id: 'preview-user-1',
+                  url: 'https://x.com/previewuser/status/1001',
+                  tweetId: '1001',
+                  authorUsername: 'previewuser',
+                  savedAt: new Date().toISOString(),
+                  tags: ['preview'],
+                  notes: 'notes',
+                  isPublic: true,
+                  metadata: {
+                    text: '第一行\n第二行\n第三行\n第四行\n第五行\n第六行',
+                  },
+                },
+              ],
+              total: 1,
+              page: 1,
+              limit: 20,
+            },
+          }),
+        })
+      })
+
+      await page.route('**/api/bookmarks/tags**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ data: { tags: ['preview'] } }),
+        })
+      })
+
+      await page.goto('/bookmarks')
+      await page.waitForLoadState('networkidle')
+
+      const card = page.getByTestId('tweet-card').first()
+      const preview = card.getByTestId('tweet-preview')
+      const linkRow = card.getByTestId('tweet-link-row')
+
+      await expect(preview).toBeVisible()
+      await expect(preview).toContainText('第一行')
+      await expect(preview).toContainText('第五行')
+      await expect(linkRow).toBeVisible()
+      await expect(linkRow).toContainText('查看 @previewuser 的推文')
+
+      const previewBox = await preview.boundingBox()
+      const linkBox = await linkRow.boundingBox()
+      expect(previewBox).not.toBeNull()
+      expect(linkBox).not.toBeNull()
+      expect((previewBox?.y ?? 0) + (previewBox?.height ?? 0)).toBeLessThan(
+        linkBox?.y ?? 0
+      )
+    })
+
+    test('没有 metadata.text 时不渲染空的推文摘要块', async ({ page }) => {
+      const adminToken = btoa('admin:zz1234zz')
+      await page.context().addCookies([
+        {
+          name: 'admin_token',
+          value: adminToken,
+          domain: 'localhost',
+          path: '/',
+        },
+      ])
+
+      await page.route('**/api/bookmarks?**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              tweets: [
+                {
+                  id: 'preview-user-2',
+                  url: 'https://x.com/previewuser/status/1002',
+                  tweetId: '1002',
+                  authorUsername: 'previewuser',
+                  savedAt: new Date().toISOString(),
+                  tags: [],
+                  notes: '',
+                  isPublic: true,
+                },
+              ],
+              total: 1,
+              page: 1,
+              limit: 20,
+            },
+          }),
+        })
+      })
+
+      await page.route('**/api/bookmarks/tags**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ data: { tags: [] } }),
+        })
+      })
+
+      await page.goto('/bookmarks')
+      await page.waitForLoadState('networkidle')
+
+      await expect(page.getByTestId('tweet-preview')).toHaveCount(0)
+      await expect(page.getByTestId('tweet-link-row')).toHaveCount(1)
+    })
+  })
+
   // ============================================
   // 验证项 1: 暗色模式文本对比度 (WCAG 2.1 AA)
   // ============================================

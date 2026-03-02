@@ -96,14 +96,21 @@ test.describe('X 推文收藏功能测试', () => {
   })
 
   test('9. API - 使用认证保存推文', async ({ request }) => {
+    const uniqueSuffix = Date.now()
+    const url = `https://x.com/elonmusk/status/${uniqueSuffix}`
+    const previewText = `Playwright metadata roundtrip ${uniqueSuffix}`
+
     const response = await request.post(
       'http://localhost:3000/api/bookmarks?username=admin&password=zz1234zz',
       {
         data: {
-          url: 'https://x.com/elonmusk/status/1234567890',
+          url,
           tags: ['tech', 'ai'],
           notes: 'Playwright 测试推文',
           isPublic: true,
+          metadata: {
+            text: previewText,
+          },
         },
       }
     )
@@ -113,9 +120,22 @@ test.describe('X 推文收藏功能测试', () => {
 
     expect(json).toHaveProperty('success', true)
     expect(json.data).toHaveProperty('id')
-    expect(json.data).toHaveProperty('url')
+    expect(json.data).toHaveProperty('url', url)
     expect(json.data.tags).toContain('tech')
     expect(json.data.tags).toContain('ai')
+
+    const queryResponse = await request.get(
+      `http://localhost:3000/api/bookmarks?username=admin&password=zz1234zz&q=${encodeURIComponent(previewText)}`
+    )
+
+    expect(queryResponse.status()).toBe(200)
+    const queryJson = await queryResponse.json()
+    const savedTweet = queryJson.data.tweets.find(
+      (tweet: { id: string }) => tweet.id === json.data.id
+    )
+
+    expect(savedTweet).toBeTruthy()
+    expect(savedTweet.metadata?.text).toBe(previewText)
   })
 
   test('10. 响应式设计 - 移动端视图', async ({ page }) => {

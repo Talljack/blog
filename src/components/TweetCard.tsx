@@ -55,6 +55,7 @@ export default function TweetCard({
 }: TweetCardProps) {
   const tweetRef = useRef<HTMLDivElement>(null)
   const [embedLoaded, setEmbedLoaded] = useState(false)
+  const previewText = tweet.metadata?.text?.trim()
 
   useEffect(() => {
     if (typeof window === 'undefined' || !tweetRef.current) return
@@ -86,46 +87,46 @@ export default function TweetCard({
     document.documentElement.classList.contains('dark')
 
   return (
-    <article className='py-6 border-b border-gray-100 dark:border-gray-800 last:border-b-0'>
+    <article
+      className='py-6 border-b border-gray-100 dark:border-gray-800 last:border-b-0'
+      data-testid='tweet-card'
+    >
       <div className='space-y-4'>
-        <div ref={tweetRef} className='tweet-embed-container'>
-          <blockquote
-            className='twitter-tweet'
-            data-theme={isDarkMode ? 'dark' : 'light'}
-          >
-            <a href={tweet.url}>@{tweet.authorUsername} 的推文</a>
-          </blockquote>
-        </div>
+        <div className='flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50'>
+          {previewText && (
+            <p
+              data-testid='tweet-preview'
+              className='text-sm leading-relaxed whitespace-pre-wrap break-words text-gray-800 dark:text-gray-200'
+              style={{
+                display: '-webkit-box',
+                WebkitBoxOrient: 'vertical',
+                WebkitLineClamp: 5,
+                overflow: 'hidden',
+              }}
+            >
+              {previewText}
+            </p>
+          )}
 
-        {!embedLoaded && (
-          <div className='flex flex-col gap-3 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700'>
-            {tweet.metadata?.text && (
-              <p className='text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap break-words'>
-                {tweet.metadata.text.length > 280
-                  ? tweet.metadata.text.slice(0, 280) + '…'
-                  : tweet.metadata.text}
-              </p>
-            )}
-            <div className='flex items-center gap-3'>
-              <svg
-                className='w-4 h-4 text-blue-400 shrink-0'
-                viewBox='0 0 24 24'
-                fill='currentColor'
-                aria-hidden='true'
-              >
-                <path d='M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' />
-              </svg>
-              <a
-                href={tweet.url}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium'
-              >
-                查看 @{tweet.authorUsername} 的推文 →
-              </a>
-            </div>
+          <div data-testid='tweet-link-row' className='flex items-center gap-3'>
+            <svg
+              className='h-4 w-4 shrink-0 text-blue-400'
+              viewBox='0 0 24 24'
+              fill='currentColor'
+              aria-hidden='true'
+            >
+              <path d='M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' />
+            </svg>
+            <a
+              href={tweet.url}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-sm font-medium text-blue-600 hover:underline dark:text-blue-400'
+            >
+              查看 @{tweet.authorUsername} 的推文 →
+            </a>
           </div>
-        )}
+        </div>
 
         <div className='space-y-3'>
           {tweet.tags.length > 0 && (
@@ -209,6 +210,24 @@ export default function TweetCard({
               </div>
             )}
           </div>
+        </div>
+
+        <div
+          ref={tweetRef}
+          className={`overflow-hidden transition-all duration-200 ${
+            embedLoaded
+              ? 'max-h-[1200px] opacity-100'
+              : 'pointer-events-none max-h-0 opacity-0'
+          }`}
+          aria-hidden={!embedLoaded}
+          data-testid='tweet-embed-container'
+        >
+          <blockquote
+            className='twitter-tweet'
+            data-theme={isDarkMode ? 'dark' : 'light'}
+          >
+            <a href={tweet.url}>@{tweet.authorUsername} 的推文</a>
+          </blockquote>
         </div>
       </div>
     </article>
