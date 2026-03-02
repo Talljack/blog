@@ -24,6 +24,22 @@ function showStatus(msg, ok) {
   show(statusEl)
 }
 
+function getTweetContextFromTab(tabId, url) {
+  return new Promise(resolve => {
+    chrome.tabs.sendMessage(
+      tabId,
+      { type: 'GET_TWEET_CONTEXT', url },
+      response => {
+        if (chrome.runtime.lastError || !response) {
+          resolve({ url, text: '' })
+          return
+        }
+        resolve(response)
+      }
+    )
+  })
+}
+
 async function init() {
   const { apiUrl, token } = await chrome.storage.sync.get(['apiUrl', 'token'])
 
@@ -52,16 +68,21 @@ async function init() {
       .map(t => t.trim())
       .filter(Boolean)
 
-    const body = {
-      url,
-      tags,
-      notes: notesInput.value.trim(),
-      isPublic: isPublicInput.checked,
-    }
-
     const base = (apiUrl || 'https://www.talljack.me').replace(/\/+$/, '')
 
     try {
+      const context = await getTweetContextFromTab(tab.id, url)
+      const body = {
+        url: context.url || url,
+        tags,
+        notes: notesInput.value.trim(),
+        isPublic: isPublicInput.checked,
+      }
+
+      if (context.text) {
+        body.metadata = { text: context.text }
+      }
+
       const res = await fetch(`${base}/api/bookmarks`, {
         method: 'POST',
         headers: {

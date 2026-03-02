@@ -2,9 +2,7 @@ const PROCESSED_ATTR = 'data-blog-save-injected'
 const STATUS_RE = /\/(\w+)\/status\/(\d+)/
 const DEDUP_KEY = 'blog_saved_tweets'
 const TTL_MS = 20 * 24 * 60 * 60 * 1000
-
-const SAVE_SVG =
-  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/></svg>'
+const CONTEXT_INVALIDATED_RE = /Extension context invalidated/i
 
 const SAVED_SVG =
   '<svg viewBox="0 0 24 24" width="18" height="18" fill="#00ba7c" stroke="#00ba7c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
@@ -45,10 +43,38 @@ function isTweetSaved(url) {
   return !!data[url]
 }
 
+function normalizeText(text) {
+  return (text || '')
+    .replace(/\u00a0/g, ' ')
+    .replace(/\s+\n/g, '\n')
+    .trim()
+}
+
+function collectText(elements) {
+  const seen = new Set()
+  const parts = []
+
+  for (let i = 0; i < elements.length; i++) {
+    const el = elements[i]
+    const text = normalizeText(el.innerText || el.textContent || '')
+    if (!text || seen.has(text)) continue
+    seen.add(text)
+    parts.push(text)
+  }
+
+  return parts.join('\n\n').trim()
+}
+
 function getTweetText(article) {
-  const textEl = article.querySelector('[data-testid="tweetText"]')
-  if (!textEl) return ''
-  return (textEl.innerText || textEl.textContent || '').trim()
+  const tweetText = collectText(
+    article.querySelectorAll('[data-testid="tweetText"]')
+  )
+  if (tweetText) return tweetText
+
+  const langText = collectText(article.querySelectorAll('[lang]'))
+  if (langText) return langText
+
+  return ''
 }
 
 function getTweetUrl(article) {
@@ -61,6 +87,50 @@ function getTweetUrl(article) {
     }
   }
   return null
+}
+
+function getArticleAuthorName(article) {
+  const nameLink = article.querySelector('a[role="link"][href^="/"]')
+  if (!nameLink) return ''
+
+  const text = normalizeText(nameLink.innerText || nameLink.textContent || '')
+  return text.replace(/^@/, '')
+}
+
+function getTweetContext(article, fallbackUrl) {
+  return {
+    url: fallbackUrl || getTweetUrl(article),
+    text: getTweetText(article),
+    authorName: getArticleAuthorName(article),
+  }
+}
+
+function getTweetArticleByUrl(url) {
+  const articles = document.querySelectorAll('article')
+  for (let i = 0; i < articles.length; i++) {
+    const article = articles[i]
+    if (getTweetUrl(article) === url) {
+      return article
+    }
+  }
+  return null
+}
+
+function hasLiveExtensionContext() {
+  return (
+    typeof chrome !== 'undefined' && !!chrome.runtime && !!chrome.runtime.id
+  )
+}
+
+function isContextInvalidatedError(err) {
+  return CONTEXT_INVALIDATED_RE.test((err && err.message) || '')
+}
+
+function recoverInvalidatedContext() {
+  showToast('扩展刚更新过，正在刷新页面恢复保存功能…', null)
+  window.setTimeout(function () {
+    window.location.reload()
+  }, 1200)
 }
 
 function showToast(message, blogUrl) {
@@ -181,25 +251,33 @@ async function saveTweet(btn, url, text) {
   btn.innerHTML =
     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="32"><animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="rotate" values="0 12 12;360 12 12" dur="1s" repeatCount="indefinite"/></circle></svg>'
   try {
+    if (!hasLiveExtensionContext()) {
+      throw new Error('Extension context invalidated')
+    }
+
     const result = await new Promise(function (resolve, reject) {
-      chrome.runtime.sendMessage(
-        { type: 'SAVE_TWEET', url: url, text: text },
-        function (response) {
-          if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message))
-            return
+      try {
+        chrome.runtime.sendMessage(
+          { type: 'SAVE_TWEET', url: url, text: text },
+          function (response) {
+            if (chrome.runtime.lastError) {
+              reject(new Error(chrome.runtime.lastError.message))
+              return
+            }
+            if (!response) {
+              reject(new Error('No response from extension background'))
+              return
+            }
+            if (response.error) {
+              reject(new Error(response.error))
+              return
+            }
+            resolve(response)
           }
-          if (!response) {
-            reject(new Error('No response from extension background'))
-            return
-          }
-          if (response.error) {
-            reject(new Error(response.error))
-            return
-          }
-          resolve(response)
-        }
-      )
+        )
+      } catch (err) {
+        reject(err)
+      }
     })
     markTweetSaved(url)
     btn.innerHTML = SAVED_SVG
@@ -210,6 +288,10 @@ async function saveTweet(btn, url, text) {
     const blogUrl = result.base ? result.base + '/bookmarks/public' : null
     showToast('推文已保存到博客', blogUrl)
   } catch (err) {
+    if (isContextInvalidatedError(err)) {
+      recoverInvalidatedContext()
+      return
+    }
     btn.innerHTML = BLOG_SVG
     btn.style.color = '#f4212e'
     btn.title = err.message || 'Save failed'
@@ -239,6 +321,22 @@ function processArticles() {
     actionBar.appendChild(wrapper)
   }
 }
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.type !== 'GET_TWEET_CONTEXT') {
+    return
+  }
+
+  const article =
+    getTweetArticleByUrl(message.url) || document.querySelector('article')
+
+  if (!article) {
+    sendResponse({ url: message.url || window.location.href, text: '' })
+    return
+  }
+
+  sendResponse(getTweetContext(article, message.url))
+})
 
 processArticles()
 const observer = new MutationObserver(function () {
