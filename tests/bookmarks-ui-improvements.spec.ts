@@ -1,6 +1,127 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('书签页面 UI 改进验证', () => {
+  test.describe('删除确认与反馈', () => {
+    test('bookmarks/public 删除操作使用自定义确认弹窗而不是浏览器 confirm', async ({
+      page,
+    }) => {
+      const adminToken = btoa('admin:zz1234zz')
+      await page.context().addCookies([
+        {
+          name: 'admin_token',
+          value: adminToken,
+          domain: 'localhost',
+          path: '/',
+        },
+      ])
+      await page.addInitScript(token => {
+        window.localStorage.setItem('admin_token', token)
+      }, adminToken)
+
+      await page.route('**/api/bookmarks?**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              tweets: [
+                {
+                  id: 'delete-user-1',
+                  url: 'https://x.com/deleteuser/status/1001',
+                  tweetId: '1001',
+                  authorUsername: 'deleteuser',
+                  savedAt: new Date().toISOString(),
+                  tags: [],
+                  notes: '',
+                  isPublic: true,
+                },
+              ],
+              total: 1,
+              page: 1,
+              limit: 20,
+            },
+          }),
+        })
+      })
+
+      await page.route('**/api/bookmarks/**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true }),
+        })
+      })
+
+      await page.goto('/bookmarks/public')
+      await page.waitForLoadState('networkidle')
+      await page.getByRole('button', { name: '删除推文 @deleteuser' }).click()
+
+      const dialog = page.getByTestId('confirm-dialog')
+      await expect(dialog).toBeVisible()
+      await expect(dialog).toContainText('删除这条收藏？')
+      await expect(dialog).toContainText('@deleteuser')
+      await expect(page.locator('dialog')).toHaveCount(0)
+    })
+
+    test('确认删除后显示成功 toast', async ({ page }) => {
+      const adminToken = btoa('admin:zz1234zz')
+      await page.context().addCookies([
+        {
+          name: 'admin_token',
+          value: adminToken,
+          domain: 'localhost',
+          path: '/',
+        },
+      ])
+      await page.addInitScript(token => {
+        window.localStorage.setItem('admin_token', token)
+      }, adminToken)
+
+      await page.route('**/api/bookmarks?**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              tweets: [
+                {
+                  id: 'delete-user-2',
+                  url: 'https://x.com/deleteuser/status/1002',
+                  tweetId: '1002',
+                  authorUsername: 'deleteuser',
+                  savedAt: new Date().toISOString(),
+                  tags: [],
+                  notes: '',
+                  isPublic: true,
+                },
+              ],
+              total: 1,
+              page: 1,
+              limit: 20,
+            },
+          }),
+        })
+      })
+
+      await page.route('**/api/bookmarks/delete-user-2', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ success: true }),
+        })
+      })
+
+      await page.goto('/bookmarks/public')
+      await page.waitForLoadState('networkidle')
+      await page.getByRole('button', { name: '删除推文 @deleteuser' }).click()
+      await page.getByRole('button', { name: '确认删除' }).click()
+
+      const toast = page.getByTestId('status-toast')
+      await expect(toast).toBeVisible()
+      await expect(toast).toContainText('已删除 @deleteuser 的收藏')
+    })
+  })
+
   test.describe('推文预览展示', () => {
     test('bookmarks 列表优先展示推文摘要，再展示链接', async ({ page }) => {
       const adminToken = btoa('admin:zz1234zz')
@@ -122,6 +243,111 @@ test.describe('书签页面 UI 改进验证', () => {
 
       await expect(page.getByTestId('tweet-preview')).toHaveCount(0)
       await expect(page.getByTestId('tweet-link-row')).toHaveCount(1)
+    })
+
+    test('超长推文摘要默认渐隐截断，并支持展开和收起', async ({ page }) => {
+      const adminToken = btoa('admin:zz1234zz')
+      await page.context().addCookies([
+        {
+          name: 'admin_token',
+          value: adminToken,
+          domain: 'localhost',
+          path: '/',
+        },
+      ])
+
+      await page.route('**/api/bookmarks?**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              tweets: [
+                {
+                  id: 'preview-user-3',
+                  url: 'https://x.com/previewuser/status/1003',
+                  tweetId: '1003',
+                  authorUsername: 'previewuser',
+                  savedAt: new Date().toISOString(),
+                  tags: [],
+                  notes: '',
+                  isPublic: true,
+                  metadata: {
+                    text: [
+                      '搜了一圈，发现很多现成方案都抓不到完整正文。',
+                      '最后还是自己补了一层提取和持久化，把 tweet content 一起存下来。',
+                      '这样回到 bookmarks 时，不用点开原链接也能先判断值不值得再读。',
+                      '列表里先看摘要，再看来源链接，阅读路径会顺很多。',
+                      '如果正文比较长，就默认截断，避免整页都被一条收藏撑开。',
+                      '真正需要细读的时候，再点一下展开全文就够了。',
+                      '交互上最好给一点渐隐提示，让人知道后面还有内容。',
+                      '按钮本身不需要太抢眼，但要足够明确。',
+                      '展开以后再提供一个收起入口，方便快速回到列表浏览状态。',
+                      '整个过程都应该围绕内容本身，而不是把界面做得太吵。',
+                    ].join('\n'),
+                  },
+                },
+              ],
+              total: 1,
+              page: 1,
+              limit: 20,
+            },
+          }),
+        })
+      })
+
+      await page.route('**/api/bookmarks/tags**', async route => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ data: { tags: [] } }),
+        })
+      })
+
+      await page.goto('/bookmarks')
+      await page.waitForLoadState('networkidle')
+
+      const preview = page.getByTestId('tweet-preview').first()
+      const toggle = page.getByTestId('tweet-preview-toggle').first()
+
+      await expect(preview).toBeVisible()
+      await expect(toggle).toBeVisible()
+      await expect(toggle).toContainText('展开全文')
+      await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+
+      const collapsedMetrics = await preview.evaluate(element => ({
+        clientHeight: element.clientHeight,
+        scrollHeight: element.scrollHeight,
+      }))
+      expect(collapsedMetrics.scrollHeight).toBeGreaterThan(
+        collapsedMetrics.clientHeight
+      )
+
+      await toggle.click()
+
+      await expect(
+        page.getByTestId('tweet-preview-toggle').first()
+      ).toContainText('收起')
+      await expect(
+        page.getByTestId('tweet-preview-toggle').first()
+      ).toHaveAttribute('aria-expanded', 'true')
+
+      const expandedMetrics = await preview.evaluate(element => ({
+        clientHeight: element.clientHeight,
+        scrollHeight: element.scrollHeight,
+      }))
+      expect(expandedMetrics.clientHeight).toBeGreaterThan(
+        collapsedMetrics.clientHeight
+      )
+
+      await page.getByTestId('tweet-preview-toggle').first().click()
+
+      await expect(
+        page.getByTestId('tweet-preview-toggle').first()
+      ).toContainText('展开全文')
+      await expect(
+        page.getByTestId('tweet-preview-toggle').first()
+      ).toHaveAttribute('aria-expanded', 'false')
     })
   })
 

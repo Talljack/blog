@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import TweetCard from '@/components/TweetCard'
 import TweetFilters from '@/components/TweetFilters'
 import EditTweetModal from '@/components/EditTweetModal'
+import ConfirmDialog from '@/components/ConfirmDialog'
+import StatusToast from '@/components/StatusToast'
 import { Tweet } from '@/types/bookmarks'
 import { Download, Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -26,6 +28,14 @@ export default function BookmarksClient() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [editingTweet, setEditingTweet] = useState<Tweet | null>(null)
+  const [tweetPendingDelete, setTweetPendingDelete] = useState<Tweet | null>(
+    null
+  )
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [toast, setToast] = useState<{
+    message: string
+    tone: 'success' | 'error'
+  } | null>(null)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [limit] = useState(20)
@@ -35,7 +45,7 @@ export default function BookmarksClient() {
     setAdmin(isAdmin())
   }, [])
 
-  const fetchTweets = async () => {
+  const fetchTweets = useEffectEvent(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams(searchParams.toString())
@@ -57,35 +67,47 @@ export default function BookmarksClient() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const fetchTags = async () => {
-    try {
-      const response = await fetch('/api/bookmarks/tags', {
-        headers: getAuthHeaders(),
-      })
-      if (response.ok) {
-        const result = await response.json()
-        const data = result.data || result
-        setTags(data.tags)
-      }
-    } catch (err) {
-      console.error('Failed to fetch tags:', err)
-    }
-  }
+  })
 
   useEffect(() => {
     fetchTweets()
-    fetchTags()
+    const loadTags = async () => {
+      try {
+        const response = await fetch('/api/bookmarks/tags', {
+          headers: getAuthHeaders(),
+        })
+        if (response.ok) {
+          const result = await response.json()
+          const data = result.data || result
+          setTags(data.tags)
+        }
+      } catch (err) {
+        console.error('Failed to fetch tags:', err)
+      }
+    }
+
+    void loadTags()
   }, [searchParams])
 
-  const handleDelete = async (tweetId: string) => {
-    if (!confirm('确定要删除这条推文收藏吗？')) {
+  const showToast = (
+    message: string,
+    tone: 'success' | 'error' = 'success'
+  ) => {
+    setToast({ message, tone })
+  }
+
+  const handleDelete = (tweet: Tweet) => {
+    setTweetPendingDelete(tweet)
+  }
+
+  const confirmDelete = async () => {
+    if (!tweetPendingDelete) {
       return
     }
 
     try {
-      const response = await fetch(`/api/bookmarks/${tweetId}`, {
+      setIsDeleting(true)
+      const response = await fetch(`/api/bookmarks/${tweetPendingDelete.id}`, {
         method: 'DELETE',
         headers: getAuthHeaders(),
       })
@@ -94,12 +116,22 @@ export default function BookmarksClient() {
         throw new Error('Failed to delete bookmark')
       }
 
-      setTweets(tweets.filter(t => t.id !== tweetId))
-      setTotal(total - 1)
+      setTweets(current =>
+        current.filter(tweet => tweet.id !== tweetPendingDelete.id)
+      )
+      setTotal(current => Math.max(0, current - 1))
+      showToast(`已删除 @${tweetPendingDelete.authorUsername} 的收藏`)
+      setTweetPendingDelete(null)
     } catch (err) {
-      alert('删除失败：' + (err instanceof Error ? err.message : '未知错误'))
+      showToast(
+        '删除失败：' + (err instanceof Error ? err.message : '未知错误'),
+        'error'
+      )
+    } finally {
+      setIsDeleting(false)
     }
   }
+
   const handleTogglePublic = async (tweetId: string, isPublic: boolean) => {
     try {
       const response = await fetch(`/api/bookmarks/${tweetId}`, {
@@ -108,9 +140,17 @@ export default function BookmarksClient() {
         body: JSON.stringify({ isPublic }),
       })
       if (!response.ok) throw new Error('Failed to update')
-      setTweets(tweets.map(t => (t.id === tweetId ? { ...t, isPublic } : t)))
+      setTweets(current =>
+        current.map(tweet =>
+          tweet.id === tweetId ? { ...tweet, isPublic } : tweet
+        )
+      )
+      showToast(isPublic ? '已设为公开显示' : '已改为私有')
     } catch (err) {
-      alert('更新失败：' + (err instanceof Error ? err.message : '未知错误'))
+      showToast(
+        '更新失败：' + (err instanceof Error ? err.message : '未知错误'),
+        'error'
+      )
     }
   }
 
@@ -138,11 +178,28 @@ export default function BookmarksClient() {
 
       const result = await response.json()
       const updatedTweet = result.data || result
-      setTweets(tweets.map(t => (t.id === tweetId ? updatedTweet : t)))
+      setTweets(current =>
+        current.map(tweet => (tweet.id === tweetId ? updatedTweet : tweet))
+      )
       setEditingTweet(null)
-      fetchTags()
+      try {
+        const tagsResponse = await fetch('/api/bookmarks/tags', {
+          headers: getAuthHeaders(),
+        })
+        if (tagsResponse.ok) {
+          const tagsResult = await tagsResponse.json()
+          const tagsData = tagsResult.data || tagsResult
+          setTags(tagsData.tags)
+        }
+      } catch (tagsError) {
+        console.error('Failed to refresh tags:', tagsError)
+      }
+      showToast('收藏已更新')
     } catch (err) {
-      alert('更新失败：' + (err instanceof Error ? err.message : '未知错误'))
+      showToast(
+        '更新失败：' + (err instanceof Error ? err.message : '未知错误'),
+        'error'
+      )
     }
   }
 
@@ -164,8 +221,12 @@ export default function BookmarksClient() {
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
+      showToast(`已导出 ${format === 'json' ? 'JSON' : 'Markdown'} 文件`)
     } catch (err) {
-      alert('导出失败：' + (err instanceof Error ? err.message : '未知错误'))
+      showToast(
+        '导出失败：' + (err instanceof Error ? err.message : '未知错误'),
+        'error'
+      )
     }
   }
 
@@ -262,6 +323,33 @@ export default function BookmarksClient() {
           onSave={handleSaveEdit}
         />
       )}
+
+      <ConfirmDialog
+        open={!!tweetPendingDelete}
+        title='删除这条收藏？'
+        description={
+          tweetPendingDelete
+            ? `这会从书签列表中移除 @${tweetPendingDelete.authorUsername} 的这条推文收藏。这个操作不能撤销。`
+            : ''
+        }
+        confirmLabel='确认删除'
+        cancelLabel='保留'
+        tone='danger'
+        pending={isDeleting}
+        onCancel={() => {
+          if (!isDeleting) {
+            setTweetPendingDelete(null)
+          }
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <StatusToast
+        open={!!toast}
+        message={toast?.message || ''}
+        tone={toast?.tone || 'success'}
+        onClose={() => setToast(null)}
+      />
 
       {/* Pagination */}
       {total > limit && (
