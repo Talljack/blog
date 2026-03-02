@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import TweetCard from '@/components/TweetCard'
 import TweetFilters from '@/components/TweetFilters'
+import ConfirmDialog from '@/components/ConfirmDialog'
+import StatusToast from '@/components/StatusToast'
 import { Tweet } from '@/types/bookmarks'
 import Link from 'next/link'
 import { isAdmin, getAdminToken } from '@/lib/admin-token'
@@ -16,8 +18,16 @@ export default function PublicBookmarksClient() {
   const [error, setError] = useState<string | null>(null)
   const [total, setTotal] = useState(0)
   const [admin, setAdmin] = useState(false)
+  const [tweetPendingDelete, setTweetPendingDelete] = useState<Tweet | null>(
+    null
+  )
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [toast, setToast] = useState<{
+    message: string
+    tone: 'success' | 'error'
+  } | null>(null)
 
-  const fetchTweets = async () => {
+  const fetchTweets = useEffectEvent(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams(searchParams.toString())
@@ -45,25 +55,46 @@ export default function PublicBookmarksClient() {
     } finally {
       setLoading(false)
     }
-  }
+  })
 
   useEffect(() => {
     setAdmin(isAdmin())
   }, [])
 
-  const handleDelete = async (tweetId: string) => {
-    if (!confirm('确定要删除这条推文收藏吗？')) return
+  const showToast = (
+    message: string,
+    tone: 'success' | 'error' = 'success'
+  ) => {
+    setToast({ message, tone })
+  }
+
+  const handleDelete = (tweet: Tweet) => {
+    setTweetPendingDelete(tweet)
+  }
+
+  const confirmDelete = async () => {
+    if (!tweetPendingDelete) return
     try {
+      setIsDeleting(true)
       const token = getAdminToken()
-      const response = await fetch(`/api/bookmarks/${tweetId}`, {
+      const response = await fetch(`/api/bookmarks/${tweetPendingDelete.id}`, {
         method: 'DELETE',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
       if (!response.ok) throw new Error('Failed to delete')
-      setTweets(tweets.filter(t => t.id !== tweetId))
-      setTotal(total - 1)
+      setTweets(current =>
+        current.filter(tweet => tweet.id !== tweetPendingDelete.id)
+      )
+      setTotal(current => Math.max(0, current - 1))
+      setTweetPendingDelete(null)
+      showToast(`已删除 @${tweetPendingDelete.authorUsername} 的收藏`)
     } catch (err) {
-      alert('删除失败：' + (err instanceof Error ? err.message : '未知错误'))
+      showToast(
+        '删除失败：' + (err instanceof Error ? err.message : '未知错误'),
+        'error'
+      )
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -79,9 +110,17 @@ export default function PublicBookmarksClient() {
         body: JSON.stringify({ isPublic }),
       })
       if (!response.ok) throw new Error('Failed to update')
-      setTweets(tweets.map(t => (t.id === tweetId ? { ...t, isPublic } : t)))
+      setTweets(current =>
+        current.map(tweet =>
+          tweet.id === tweetId ? { ...tweet, isPublic } : tweet
+        )
+      )
+      showToast(isPublic ? '已设为公开显示' : '已改为私有')
     } catch (err) {
-      alert('更新失败：' + (err instanceof Error ? err.message : '未知错误'))
+      showToast(
+        '更新失败：' + (err instanceof Error ? err.message : '未知错误'),
+        'error'
+      )
     }
   }
 
@@ -159,6 +198,33 @@ export default function PublicBookmarksClient() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!tweetPendingDelete}
+        title='删除这条收藏？'
+        description={
+          tweetPendingDelete
+            ? `这会从公开收藏页移除 @${tweetPendingDelete.authorUsername} 的这条推文收藏。这个操作不能撤销。`
+            : ''
+        }
+        confirmLabel='确认删除'
+        cancelLabel='取消'
+        tone='danger'
+        pending={isDeleting}
+        onCancel={() => {
+          if (!isDeleting) {
+            setTweetPendingDelete(null)
+          }
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      <StatusToast
+        open={!!toast}
+        message={toast?.message || ''}
+        tone={toast?.tone || 'success'}
+        onClose={() => setToast(null)}
+      />
     </>
   )
 }
