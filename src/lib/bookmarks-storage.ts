@@ -10,6 +10,67 @@ const KEYS = {
   allTags: 'tweets:tags:all',
 }
 
+function parseJsonField<T>(value: unknown): T | undefined {
+  if (value == null || value === '') {
+    return undefined
+  }
+
+  if (typeof value === 'object') {
+    return value as T
+  }
+
+  if (typeof value !== 'string') {
+    return undefined
+  }
+
+  try {
+    return JSON.parse(value) as T
+  } catch {
+    return undefined
+  }
+}
+
+function readStringField(value: unknown): string {
+  if (typeof value === 'string') {
+    return value
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value)
+  }
+
+  return ''
+}
+
+function normalizeTweetRecord(record: Record<string, unknown>): Tweet {
+  const tagsValue = record.tags
+  const parsedTags = Array.isArray(tagsValue)
+    ? tagsValue
+    : parseJsonField<unknown[]>(tagsValue)
+  const tags = Array.isArray(parsedTags)
+    ? parsedTags.filter((tag): tag is string => typeof tag === 'string')
+    : typeof tagsValue === 'string' && tagsValue.length > 0
+      ? tagsValue
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(Boolean)
+      : []
+
+  const metadata = parseJsonField<Tweet['metadata']>(record.metadata)
+
+  return {
+    id: readStringField(record.id),
+    url: readStringField(record.url),
+    tweetId: readStringField(record.tweetId),
+    authorUsername: readStringField(record.authorUsername),
+    savedAt: readStringField(record.savedAt) || new Date().toISOString(),
+    tags,
+    notes: readStringField(record.notes),
+    isPublic: record.isPublic === true || record.isPublic === 'true',
+    ...(metadata ? { metadata } : {}),
+  }
+}
+
 function isRedisConfigured(): boolean {
   return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
 }
@@ -26,6 +87,25 @@ function getRedis(): Redis {
 }
 
 export class BookmarksStorage {
+  private serializeTweetForRedis(tweet: Tweet): Record<string, string> {
+    const payload: Record<string, string> = {
+      id: tweet.id,
+      url: tweet.url,
+      tweetId: tweet.tweetId,
+      authorUsername: tweet.authorUsername,
+      savedAt: tweet.savedAt,
+      tags: JSON.stringify(tweet.tags),
+      notes: tweet.notes,
+      isPublic: String(tweet.isPublic),
+    }
+
+    if (tweet.metadata) {
+      payload.metadata = JSON.stringify(tweet.metadata)
+    }
+
+    return payload
+  }
+
   async saveTweet(data: {
     url: string
     tags: string[]
@@ -60,7 +140,7 @@ export class BookmarksStorage {
       const redis = getRedis()
       const pipeline = redis.pipeline()
 
-      pipeline.hset(KEYS.tweet(id), tweet as unknown as Record<string, unknown>)
+      pipeline.hset(KEYS.tweet(id), this.serializeTweetForRedis(tweet))
       pipeline.zadd(KEYS.tweetsAll, { score: Date.now(), member: id })
 
       if (data.isPublic) {
@@ -88,7 +168,7 @@ export class BookmarksStorage {
         if (!tweet || Object.keys(tweet).length === 0) {
           return null
         }
-        return tweet as unknown as Tweet
+        return normalizeTweetRecord(tweet as Record<string, unknown>)
       } catch (error) {
         console.error('Redis getTweet error, falling back to file:', error)
         return await this.getTweetFromFile(id)
@@ -127,10 +207,7 @@ export class BookmarksStorage {
       const redis = getRedis()
       const pipeline = redis.pipeline()
 
-      pipeline.hset(
-        KEYS.tweet(id),
-        updatedTweet as unknown as Record<string, unknown>
-      )
+      pipeline.hset(KEYS.tweet(id), this.serializeTweetForRedis(updatedTweet))
 
       if (updates.tags) {
         const tagsToRemove = oldTags.filter(tag => !newTags.includes(tag))
@@ -259,7 +336,7 @@ export class BookmarksStorage {
           typeof result === 'object' &&
           Object.keys(result as object).length > 0
       )
-      .map(result => result as unknown as Tweet)
+      .map(result => normalizeTweetRecord(result))
 
     if (params.q) {
       const query = params.q.toLowerCase()
@@ -318,7 +395,7 @@ export class BookmarksStorage {
               typeof result === 'object' &&
               Object.keys(result as object).length > 0
           )
-          .map(result => result as unknown as Tweet)
+          .map(result => normalizeTweetRecord(result))
       } catch (error) {
         console.error(
           'Redis exportAllTweets error, falling back to file:',
