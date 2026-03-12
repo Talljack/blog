@@ -338,6 +338,12 @@ export class BookmarksStorage {
       )
       .map(result => normalizeTweetRecord(result))
 
+    // Sort by savedAt descending (newest first)
+    // Redis smembers (used for tag/public filters) returns unordered results
+    tweets.sort(
+      (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
+    )
+
     if (params.q) {
       const query = params.q.toLowerCase()
       tweets = tweets.filter(

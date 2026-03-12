@@ -18,6 +18,7 @@ export default function PublicBookmarksClient() {
   const [error, setError] = useState<string | null>(null)
   const [total, setTotal] = useState(0)
   const [admin, setAdmin] = useState(false)
+  const [showAll, setShowAll] = useState(false)
   const [tweetPendingDelete, setTweetPendingDelete] = useState<Tweet | null>(
     null
   )
@@ -31,11 +32,24 @@ export default function PublicBookmarksClient() {
     try {
       setLoading(true)
       const params = new URLSearchParams(searchParams.toString())
-      params.set('public', 'true')
-      const response = await fetch(`/api/bookmarks?${params.toString()}`)
+      const headers: HeadersInit = {}
+
+      if (admin && showAll) {
+        // Admin viewing all bookmarks - send auth, don't filter by public
+        const token = getAdminToken()
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`
+        }
+      } else {
+        params.set('public', 'true')
+      }
+
+      const response = await fetch(`/api/bookmarks?${params.toString()}`, {
+        headers,
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch public bookmarks')
+        throw new Error('Failed to fetch bookmarks')
       }
 
       const result = await response.json()
@@ -49,9 +63,7 @@ export default function PublicBookmarksClient() {
       })
       setTags(Array.from(allTags))
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to load public bookmarks'
-      )
+      setError(err instanceof Error ? err.message : 'Failed to load bookmarks')
     } finally {
       setLoading(false)
     }
@@ -126,7 +138,7 @@ export default function PublicBookmarksClient() {
 
   useEffect(() => {
     fetchTweets()
-  }, [searchParams])
+  }, [searchParams, showAll])
 
   if (error) {
     return (
@@ -138,14 +150,39 @@ export default function PublicBookmarksClient() {
 
   return (
     <>
-      {/* Back Link */}
-      <div className='mb-6'>
+      {/* Back Link & View Toggle */}
+      <div className='mb-6 flex items-center justify-between'>
         <Link
           href='/bookmarks'
           className='text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'
         >
           ← 返回所有收藏
         </Link>
+
+        {admin && (
+          <div className='inline-flex rounded-lg border border-gray-200 dark:border-gray-700 p-0.5'>
+            <button
+              onClick={() => setShowAll(true)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                showAll
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              全部
+            </button>
+            <button
+              onClick={() => setShowAll(false)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                !showAll
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              仅公开
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Filters */}
@@ -153,7 +190,7 @@ export default function PublicBookmarksClient() {
 
       {/* Stats */}
       <div className='mb-4 text-sm text-gray-600 dark:text-gray-400'>
-        共 {total} 条公开推文
+        共 {total} 条{showAll ? '' : '公开'}推文
       </div>
 
       {/* Tweet List */}
