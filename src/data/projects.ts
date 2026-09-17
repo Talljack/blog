@@ -29,7 +29,7 @@ export const featuredProjects: Project[] = [
     description:
       '集中追踪订阅服务、续费日期与多币种支出，通过智能提醒、可视化分析、年度报告和 AI 财务助手，看清每一笔周期性开销。',
     href: 'https://github.com/Talljack/subscription-manage-community',
-    productHref: 'https://www.wheremymoney.pro',
+    productHref: 'https://my-subscriptions.vercel.app',
     productLabel: '管理我的订阅',
     signal: 'Tracking · Reminders · Analytics',
     stack: ['Next.js', 'PostgreSQL', 'Stripe', 'AI Assistant'],
