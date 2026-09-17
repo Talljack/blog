@@ -38,6 +38,11 @@ export default function SEO({
 }: SEOProps) {
   const pathname = usePathname()
   const pageTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name
+  const twitterHandle = siteConfig.author.social.twitter
+    .split('/')
+    .filter(Boolean)
+    .pop()
+    ?.replace('@', '')
 
   const pageUrl = canonical ? `${siteConfig.url}${canonical}` : siteConfig.url
 
@@ -190,16 +195,10 @@ export default function SEO({
 
       {/* Twitter Card */}
       <meta name='twitter:card' content='summary_large_image' />
-      {siteConfig.author.social?.twitter && (
+      {twitterHandle && (
         <>
-          <meta
-            name='twitter:site'
-            content={`@${siteConfig.author.social.twitter.replace('@', '')}`}
-          />
-          <meta
-            name='twitter:creator'
-            content={`@${siteConfig.author.social.twitter.replace('@', '')}`}
-          />
+          <meta name='twitter:site' content={`@${twitterHandle}`} />
+          <meta name='twitter:creator' content={`@${twitterHandle}`} />
         </>
       )}
       <meta name='twitter:title' content={title || siteConfig.name} />
@@ -271,7 +270,7 @@ export default function SEO({
         name='viewport'
         content='width=device-width, initial-scale=1.0, maximum-scale=5.0'
       />
-      <meta name='theme-color' content='#3b82f6' />
+      <meta name='theme-color' content='#84cc16' />
       <meta name='color-scheme' content='light dark' />
 
       {/* 预连接 */}

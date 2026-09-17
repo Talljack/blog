@@ -1,21 +1,14 @@
 'use client'
 
 import { siteConfig } from '@/lib/config'
-import { useEffect, useState } from 'react'
 import TotalViewsCounter from './TotalViewsCounter'
 
 export default function Footer() {
-  const [currentDate, setCurrentDate] = useState('')
-
-  useEffect(() => {
-    // 设置项目开始日期和Present格式
-    const projectStartDate = '2025-09-01' // 你可以根据实际项目开始时间调整
-    setCurrentDate(`${projectStartDate} - Present`)
-  }, [])
+  const currentDate = '2017 — Present'
 
   return (
     <footer className='mt-16 py-8 border-t border-gray-200 dark:border-gray-800'>
-      <div className='max-w-2xl mx-auto px-6'>
+      <div className='max-w-5xl mx-auto px-6 sm:px-8'>
         <div className='text-center space-y-4'>
           {/* 总访问量和当前日期 */}
           <div className='flex items-center justify-center space-x-4 text-xs text-gray-400 dark:text-gray-600'>

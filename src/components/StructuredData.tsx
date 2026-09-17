@@ -79,7 +79,7 @@ export default function StructuredData({
         '@type': 'BlogPosting',
         headline: data.title,
         description: data.description,
-        image: `${siteConfig.url}/og-image.jpg`,
+        image: `${siteConfig.url}/og-image.png`,
         author: {
           '@type': 'Person',
           name: data.author || siteConfig.author.name,
@@ -273,7 +273,7 @@ export default function StructuredData({
         '@type': 'HowTo',
         name: data?.title || 'How To Guide',
         description: data?.description || '',
-        image: `${siteConfig.url}/og-image.jpg`,
+        image: `${siteConfig.url}/og-image.png`,
         estimatedCost: {
           '@type': 'MonetaryAmount',
           currency: 'CNY',
@@ -297,7 +297,7 @@ export default function StructuredData({
         '@type': 'TechArticle',
         headline: data.title,
         description: data.description,
-        image: `${siteConfig.url}/og-image.jpg`,
+        image: `${siteConfig.url}/og-image.png`,
         author: {
           '@type': 'Person',
           name: data.author || siteConfig.author.name,

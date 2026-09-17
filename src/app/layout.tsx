@@ -13,10 +13,7 @@ import { siteConfig } from '@/lib/config'
 import { getDefaultMetadata } from '@/lib/metadata'
 import { viewport as defaultViewport } from '@/lib/viewport'
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
 
 // 使用增强的元数据生成系统
 export const metadata: Metadata = {
@@ -88,7 +85,7 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
     'format-detection': 'telephone=no',
-    'msapplication-TileColor': '#3b82f6',
+    'msapplication-TileColor': '#bef264',
     'msapplication-config': '/browserconfig.xml',
   },
 }
@@ -127,12 +124,12 @@ export default function RootLayout({
         {/* 性能优化和主题设置 */}
         <meta
           name='theme-color'
-          content='#3b82f6'
+          content='#faf9f5'
           media='(prefers-color-scheme: light)'
         />
         <meta
           name='theme-color'
-          content='#1e293b'
+          content='#1c1917'
           media='(prefers-color-scheme: dark)'
         />
         <meta name='color-scheme' content='light dark' />
@@ -148,10 +145,10 @@ export default function RootLayout({
         <meta name='apple-mobile-web-app-title' content={siteConfig.name} />
 
         {/* Microsoft Tiles */}
-        <meta name='msapplication-TileColor' content='#3b82f6' />
+        <meta name='msapplication-TileColor' content='#bef264' />
         <meta name='msapplication-TileImage' content='/ms-icon-144x144.png' />
       </head>
-      <body className={inter.className}>
+      <body>
         <GoogleAnalytics />
         <SEOOptimizer />
         <ResourcePreloader />
@@ -162,7 +159,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <PWAUpdateBanner />
-          <ReadingProgress color='#3b82f6' height={3} />
+          <ReadingProgress color='#84cc16' height={3} />
           <div className='relative min-h-screen flex flex-col'>
             <Header />
             <main

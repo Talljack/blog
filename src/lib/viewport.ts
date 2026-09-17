@@ -8,8 +8,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+    { media: '(prefers-color-scheme: light)', color: '#faf9f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#1c1917' },
   ],
 }
 
@@ -33,16 +33,16 @@ export function generateViewport(
       ? [
           {
             media: '(prefers-color-scheme: light)',
-            color: themeColor.light || '#ffffff',
+            color: themeColor.light || '#faf9f5',
           },
           {
             media: '(prefers-color-scheme: dark)',
-            color: themeColor.dark || '#0f172a',
+            color: themeColor.dark || '#1c1917',
           },
         ]
       : [
-          { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-          { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+          { media: '(prefers-color-scheme: light)', color: '#faf9f5' },
+          { media: '(prefers-color-scheme: dark)', color: '#1c1917' },
         ],
   }
 }

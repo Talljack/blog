@@ -26,7 +26,7 @@ const preloadConfig: PreloadConfig = {
   ],
 
   // 关键图片资源
-  images: ['/favicon.ico', '/apple-touch-icon.png', '/og-image.jpg'],
+  images: ['/favicon.ico', '/apple-touch-icon.png', '/og-image.png'],
 
   // 关键路由页面
   routes: ['/', '/blog', '/about'],

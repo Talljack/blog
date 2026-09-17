@@ -10,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['LXGW WenKai Lite', 'Noto Serif SC', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Consolas', 'Monaco', 'monospace'],
       },
       typography: {

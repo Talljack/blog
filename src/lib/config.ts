@@ -1,20 +1,23 @@
 export const siteConfig = {
-  name: process.env.NEXT_PUBLIC_SITE_NAME || '我的博客',
+  name: 'Talljack — Independent Builder',
   description:
-    process.env.NEXT_PUBLIC_SITE_DESCRIPTION || '分享技术心得与生活感悟',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://your-blog-url.com',
+    'Talljack 的产品、开源项目与构建笔记：AI、开发者工具和原生应用。',
+  url: 'https://talljack.me',
   ogImage: '/og-image.png',
   author: {
-    name: process.env.NEXT_PUBLIC_AUTHOR_NAME || '你的名字',
-    bio: process.env.NEXT_PUBLIC_AUTHOR_BIO || '全栈开发者，热爱技术与写作',
-    avatar: process.env.NEXT_PUBLIC_AUTHOR_AVATAR || '/avatar.jpg',
+    name: 'Talljack',
+    bio: '独立开发者，持续构建 AI 产品、开发者工具与原生应用。',
+    avatar: process.env.NEXT_PUBLIC_AUTHOR_AVATAR || '',
     social: {
-      twitter: process.env.NEXT_PUBLIC_TWITTER_URL || '',
-      github: process.env.NEXT_PUBLIC_GITHUB_URL || '',
+      twitter:
+        process.env.NEXT_PUBLIC_TWITTER_URL || 'https://x.com/Talljackcv',
+      github:
+        process.env.NEXT_PUBLIC_GITHUB_URL || 'https://github.com/Talljack',
       email: process.env.NEXT_PUBLIC_EMAIL || '',
     },
   },
   navigation: [
+    { name: '作品', href: '/#work' },
     { name: '博客', href: '/blog' },
     { name: '课程', href: '/course' },
     { name: '模板', href: '/template' },
@@ -22,7 +25,16 @@ export const siteConfig = {
     { name: '关于', href: '/about' },
   ],
   seo: {
-    keywords: ['博客', '技术', '开发', '编程'],
+    keywords: [
+      'Talljack',
+      '独立开发者',
+      'AI 产品',
+      '开发者工具',
+      '开源',
+      'macOS',
+      'EchoType',
+      'Menu Hub',
+    ],
   },
   rss: {
     title: `${process.env.NEXT_PUBLIC_SITE_NAME || '我的博客'} RSS`,
@@ -50,12 +62,13 @@ export const siteConfig = {
     maxTagsDisplay: parseInt(process.env.MAX_TAGS_DISPLAY || '20'),
   },
   pwa: {
-    name: process.env.NEXT_PUBLIC_SITE_NAME || '我的博客',
-    shortName: '博客',
+    name: process.env.NEXT_PUBLIC_SITE_NAME || 'Talljack',
+    shortName: 'Talljack',
     description:
-      process.env.NEXT_PUBLIC_SITE_DESCRIPTION || '分享技术心得与生活感悟',
-    themeColor: '#3b82f6',
-    backgroundColor: '#ffffff',
+      process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
+      'AI 产品、开发者工具和原生应用的构建日志。',
+    themeColor: '#bef264',
+    backgroundColor: '#faf9f5',
     display: 'standalone',
     orientation: 'portrait-primary',
     scope: '/',

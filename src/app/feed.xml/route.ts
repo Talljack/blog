@@ -31,7 +31,7 @@ export async function GET(_request: NextRequest) {
     <sy:updatePeriod>hourly</sy:updatePeriod>
     <sy:updateFrequency>1</sy:updateFrequency>
     <image>
-      <url>${siteUrl}/og-image.jpg</url>
+      <url>${siteUrl}/og-image.png</url>
       <title>${siteConfig.name}</title>
       <link>${siteUrl}</link>
       <width>1200</width>

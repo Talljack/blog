@@ -61,6 +61,11 @@ export function generateMetadata(options: MetadataOptions): Metadata {
   // 构建页面标题
   const pageTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name
   const pageDescription = description || siteConfig.description
+  const twitterHandle = siteConfig.author.social.twitter
+    .split('/')
+    .filter(Boolean)
+    .pop()
+    ?.replace('@', '')
 
   // 构建完整URL
   const baseUrl = process.env.SITE_URL || siteConfig.url
@@ -132,12 +137,8 @@ export function generateMetadata(options: MetadataOptions): Metadata {
       title: title || siteConfig.name,
       description: pageDescription,
       images: [ogImage],
-      creator: siteConfig.author.social?.twitter
-        ? `@${siteConfig.author.social.twitter.replace('@', '')}`
-        : undefined,
-      site: siteConfig.author.social?.twitter
-        ? `@${siteConfig.author.social.twitter.replace('@', '')}`
-        : undefined,
+      creator: twitterHandle ? `@${twitterHandle}` : undefined,
+      site: twitterHandle ? `@${twitterHandle}` : undefined,
     },
 
     // 其他元数据
@@ -172,7 +173,7 @@ export function generateMetadata(options: MetadataOptions): Metadata {
         {
           rel: 'mask-icon',
           url: '/safari-pinned-tab.svg',
-          color: '#3b82f6',
+          color: '#84cc16',
         },
       ],
     },

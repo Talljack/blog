@@ -61,7 +61,7 @@ export async function generateMetadata({
       tags: post.tags,
       images: [
         {
-          url: '/og-image.jpg', // 你可以为每篇文章设置特定的图片
+          url: '/og-image.png', // 你可以为每篇文章设置特定的图片
           width: 1200,
           height: 630,
           alt: post.title,
@@ -72,7 +72,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
-      images: ['/og-image.jpg'],
+      images: ['/og-image.png'],
     },
     alternates: {
       canonical: `/blog/${slug}`,

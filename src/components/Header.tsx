@@ -15,12 +15,20 @@ export default function Header() {
 
   return (
     <header className='w-full py-6'>
-      <div className='max-w-4xl mx-auto px-6'>
+      <div className='max-w-5xl mx-auto px-6 sm:px-8'>
         {/* 顶部导航栏 - 优化布局 */}
         <div className='flex justify-between items-center mb-6'>
           <div className='flex items-center space-x-6'>
             {/* Logo组件 - 点击回到主页 */}
-            <Logo size={28} />
+            <div className='flex items-center gap-2.5'>
+              <Logo size={28} />
+              <Link
+                href='/'
+                className='code-font hidden text-xs font-bold tracking-[0.12em] text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-500 dark:text-stone-100 sm:inline'
+              >
+                TALLJACK
+              </Link>
+            </div>
 
             {/* 导航菜单 */}
             <nav className='hidden sm:block'>
@@ -54,7 +62,7 @@ export default function Header() {
           <div className='flex items-center space-x-3'>
             {/* 全局搜索 */}
             <div className='hidden lg:block'>
-              <Search className='w-64' placeholder='搜索博客、课程、模板...' />
+              <Search className='w-64' placeholder='搜索文章与构建笔记...' />
             </div>
 
             <div className='flex items-center space-x-2'>
@@ -111,14 +119,11 @@ export default function Header() {
 
         {/* 中小屏幕的搜索和导航 */}
         <div className='lg:hidden mb-4'>
-          <Search
-            className='w-full mb-4'
-            placeholder='搜索博客、课程、模板...'
-          />
+          <Search className='w-full mb-4' placeholder='搜索文章与构建笔记...' />
 
           {/* 移动端导航 */}
           <nav className='sm:hidden'>
-            <ul className='flex space-x-4 text-sm justify-center'>
+            <ul className='flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm'>
               {siteConfig.navigation.map(nav => {
                 const isActive =
                   pathname === nav.href ||
@@ -170,7 +175,7 @@ export default function Header() {
             <div className='mb-6 hidden lg:block'>
               <Search
                 className='max-w-sm'
-                placeholder='搜索博客、课程、模板...'
+                placeholder='搜索文章与构建笔记...'
               />
             </div>
 
